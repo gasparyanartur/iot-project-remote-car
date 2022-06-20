@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\esp32-tutorials"
+		},
+		{
+			"name": "wifi-cam",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
