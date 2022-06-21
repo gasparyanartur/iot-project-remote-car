@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "wifi-cam",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.puml": "plantuml",
+			"cstddef": "cpp",
+			"limits": "cpp"
+		}
+	}
+}
