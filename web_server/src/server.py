@@ -1,11 +1,9 @@
 import websockets as ws
 import asyncio
 
-
 async def handler(socket):
     print("connected")
     async for msg in socket:
-        print(msg)
         if msg == "cat":
             print("kitty time")
             await socket.send("ok")
