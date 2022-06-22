@@ -4,15 +4,9 @@
 			"path": ".."
 		},
 		{
-			"name": "wifi-cam",
+			"name": "esp32-controller",
 			"path": "."
 		}
 	],
-	"settings": {
-		"files.associations": {
-			"*.puml": "plantuml",
-			"cstddef": "cpp",
-			"limits": "cpp"
-		}
-	}
+	"settings": {}
 }
