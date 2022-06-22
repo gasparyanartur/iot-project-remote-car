@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "c:/Users/gaspa/dev/embedded/car-project/wifi-cam",
-      "program": "c:/Users/gaspa/dev/embedded/car-project/wifi-cam/build/Debug/outDebug",
+      "cwd": "c:/Users/gaspa/dev/embedded/car-project",
+      "program": "c:/Users/gaspa/dev/embedded/car-project/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
