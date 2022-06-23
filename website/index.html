@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autorobot</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer="true"></script>
+</head>
+<body>
+    <main>
+        <nav>
+            <button id="connect-button" class="activity-state entry-state">Connection</button>
+            <button id="cam-button" class="activity-state active-state">Camera</button>
+        </nav>
+        <section id="menu">
+            <div class="activity-state entry-state" id="connection-menu">
+                <span><span>URI: </span><input id="uri-input"><button id="uri-connect-button">Connect</button></span>
+            </div>
+
+            <div class="activity-state active-state" id="camera-menu">
+                <div id="camera-display"></div>
+            </div>
+        </section> 
+    </main>
+
+
+</body>
+</html>

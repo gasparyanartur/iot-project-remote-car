@@ -1,0 +1,35 @@
+body {
+    background-color: black;
+    display: flex;
+    height: 95vh;
+    width: 100vw;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2%;
+    margin: 0;
+}
+
+main {
+    background-color: yellowgreen;
+    align-self: center;
+    height: 90%;
+    width: 90%;
+    top: 5%;
+    
+}
+
+#map {
+    background-color:  slategray;
+}
+
+.hidden {
+    display: none;
+}
+
+#camera-frame {
+    margin-top: 1%;
+    margin-left: 3%;
+    width: 600px;
+    height: 450px;
+    background-color: white;
+}
