@@ -1,30 +1,40 @@
 import websockets as ws
 import asyncio
 
+sockets = dict()
+
+
 async def handler(socket):
-    print("connected")
+    global sockets
+    sockets[socket] = len(sockets)
+
+    print(f"Client connected with id: {sockets[socket]}")
     async for msg in socket:
-        if msg == "cat":
-            print("kitty time")
-            await socket.send("ok")
+        print("got message", list(msg))
 
-            cat_pieces = []
-            while (chunk := await socket.recv()) != "cat done":
-                cat_pieces.append(chunk)
-            
+        if msg[-1] == '\n':
+            msg = msg[:-1]
 
-            with open("saved_cat.jpg", "wb") as new_cat_img:
-                for pcs in cat_pieces:
-                    new_cat_img.write(pcs)
+        if msg[-1] == '\r':
+            msg = msg[:-1]
+
+        if msg == "cam":
+            await socket.send("cam")
+
+            resp = await socket.recv()
+
+            if resp == "fail":
+                continue
+
+            with open('cam_img.jpg', 'wb') as file:
+                file.write(await socket.recv())
 
         else:
-            print(msg)
-
-        #await socket.send(f"Hello, {name}")
-        #print(">>> hello", name)
+            print(msg, end='' if msg[-1] == '\n' else '\n')
 
 
 async def start():
+    print("Server running")
     async with ws.serve(handler, "192.168.1.104", 8001):
         await asyncio.Future()
 

@@ -40,7 +40,9 @@ void startSensorController() {
     }
 
     sensor_t * cameraSensor = esp_camera_sensor_get();
-    cameraSensor->set_framesize(cameraSensor, FRAMESIZE_QVGA);
+    cameraSensor->set_framesize(cameraSensor, config.frame_size);
+    cameraSensor->set_pixformat(cameraSensor, config.pixel_format);
+    cameraSensor->set_quality(cameraSensor, config.jpeg_quality);
 
     Serial.println("Sensor controller initiated");
 }

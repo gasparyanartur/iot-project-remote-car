@@ -1,3 +1,5 @@
+#pragma once
+
 #define CAMERA_MODEL_WROVER_KIT
 
 #if defined(CAMERA_MODEL_WROVER_KIT)
