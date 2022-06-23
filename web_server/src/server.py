@@ -4,7 +4,7 @@ import asyncio
 sockets = dict()
 
 
-async def handler(socket):
+async def robot_handler(socket):
     global sockets
     sockets[socket] = len(sockets)
 
@@ -33,14 +33,28 @@ async def handler(socket):
             print(msg, end='' if msg[-1] == '\n' else '\n')
 
 
-async def start():
-    print("Server running")
-    async with ws.serve(handler, "192.168.1.104", 8001):
+async def interface_handler(socket):
+    ...
+
+
+async def start_robot_server():
+    print("Robot server running")
+
+    async with ws.serve(robot_handler, "192.168.1.104", 8001):
+        await asyncio.Future()
+
+
+async def start_interface_server():
+    print("Interface server running")
+
+    async with ws.serve(interface_handler, "192.168.1.104", 8002):
         await asyncio.Future()
 
 
 def start_server():
-    asyncio.run(start())
+    event_loop = asyncio.get_event_loop()
+    routines = [start_robot_server(), start_interface_server()]
+    event_loop.run_until_complete(asyncio.gather(*routines))
 
 
 if __name__ == "__main__":
