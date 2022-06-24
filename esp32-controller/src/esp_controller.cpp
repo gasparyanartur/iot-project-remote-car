@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "web_client.h"
+//#include "web_server.h"
 #include "sensor_controller.h"
 
 
@@ -13,11 +14,13 @@ void setup()
   startSensorController(); 
   Serial.println();
   startWebClient();
+  //startWebServer();
 
   Serial.println("\nSetup complete\n");
 }
 
 void loop() {
   updateWebClient();
+  //updateWebServer();
 };
 

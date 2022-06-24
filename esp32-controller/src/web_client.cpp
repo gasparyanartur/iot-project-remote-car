@@ -1,13 +1,12 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include "web_client.h"
 #include <ArduinoWebsockets.h>
+#include <WiFi.h>
+
+#include "web_client.h"
 #include "esp_camera.h"
-#include <bitset>
 
 const char NW_SSID[] = "Artur";
 const char NW_PW[] = "23D3037900C64";
-
 const char SOCKET_URI[] = "ws://192.168.1.104:8001";
 
 websockets::WebsocketsClient client;
@@ -74,7 +73,6 @@ void onMessageCallback(websockets::WebsocketsMessage message)
       }
 
       client.send("ok");
-
       client.sendBinary((char *)fb->buf, fb->len);
 
       esp_camera_fb_return(fb);
