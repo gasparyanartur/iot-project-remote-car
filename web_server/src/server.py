@@ -1,40 +1,116 @@
 import websockets as ws
 import asyncio
 
-sockets = dict()
+# sockets = dict()
 
+# robot_server = None
+# interface_server = None
+sockets = [None, None]
+robot_index = 0
+interface_index = 1
+
+
+class Callback:
+    def __init__(self, condition, callback) -> None:
+        self.condition = condition
+        self.callback = callback
+
+    def test(self, msg) -> bool:
+        return self.condition(msg)
+
+    async def execute(self, socket, msg) -> any:
+        await self.callback(socket, msg)
+
+
+async def handler(socket, name, socket_index, on_close, string_callbacks: list[Callback], binary_callbacks: list[Callback]):
+    # TODO: Refactor handler to classes
+    global sockets
+
+    sockets[socket_index] = socket
+    print(f"Client ({name}, {socket_index}) connected")
+
+    while True:
+        try:
+            msg = await socket.recv()
+
+            if isinstance(msg, str):
+                msg = msg.strip()
+
+                found = False
+                for cb in string_callbacks:
+                    if cb.test(msg):
+                        await cb.execute(socket, msg)
+                        found = True
+                        break
+
+                if found:
+                    continue
+
+                print(f">> {name}: {msg}")
+
+            elif isinstance(msg, bytes):
+                ...
+                # TODO: Handle that
+
+        except ws.ConnectionClosedOK:
+            print(f"Connection with {name} closed")
+            on_close()
+            break
+
+
+async def robot_cam_callback(socket, msg):
+    await socket.send("cam")
+
+    res = await socket.recv()
+
+    if res == "fail":
+        print("Could not receive camera frame")
+        return
+
+    elif res != "ok":
+        print(f"Received invalid status message {res}")
+        return
+
+    with open('cam_img.jpg', 'wb') as file:
+        file.write(await socket.recv())
+
+
+async def interface_cam_callback(socket, msg):
+    robot_socket = sockets[robot_index]
+    if not robot_socket or robot_socket.closed:
+        await socket.send("fail")
+        return
+
+    await robot_socket.send("/cam")
+    resp = await socket.recv()
+
+    if resp == "fail":
+        await socket.send("fail")
+        return
+
+    else:
+        socket.send("ok")
+
+    await socket.send(await robot_socket.recv())
+
+
+robot_cam_request = Callback(
+    lambda msg: msg == "/cam",
+    robot_cam_callback
+)
+
+
+interface_cam_request = Callback(
+    lambda msg: msg == "/cam",
+    interface_cam_callback
+)
 
 async def robot_handler(socket):
-    global sockets
-    sockets[socket] = len(sockets)
-
-    print(f"Client connected with id: {sockets[socket]}")
-    async for msg in socket:
-        print("got message", list(msg))
-
-        if msg[-1] == '\n':
-            msg = msg[:-1]
-
-        if msg[-1] == '\r':
-            msg = msg[:-1]
-
-        if msg == "cam":
-            await socket.send("cam")
-
-            resp = await socket.recv()
-
-            if resp == "fail":
-                continue
-
-            with open('cam_img.jpg', 'wb') as file:
-                file.write(await socket.recv())
-
-        else:
-            print(msg, end='' if msg[-1] == '\n' else '\n')
+    await handler(socket, "robot", 0, None, [robot_cam_request], [])
 
 
 async def interface_handler(socket):
-    ...
+    await handler(socket, "interface", 1, None, [interface_cam_request], [])
 
 
 async def start_robot_server():
