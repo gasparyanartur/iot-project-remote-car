@@ -4,6 +4,7 @@
 
 #include "web_client.h"
 #include "esp_camera.h"
+#include "message_types.h"
 
 const char NW_SSID[] = "Artur";
 const char NW_PW[] = "23D3037900C64";
@@ -72,8 +73,13 @@ void onMessageCallback(websockets::WebsocketsMessage message)
          return;
       }
 
-      client.send("ok");
-      client.sendBinary((char *)fb->buf, fb->len);
+      const size_t msgLen = fb->len + 1;
+      char msg[msgLen];
+
+      msg[0] = MessageType::IMAGE_TYPE;
+      std::copy(fb->buf, fb->buf + fb->len, msg + 1);
+
+      client.sendBinary(msg, fb->len + 1);
 
       esp_camera_fb_return(fb);
    }

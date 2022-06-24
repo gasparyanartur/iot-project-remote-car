@@ -9,36 +9,71 @@ sockets = [None, None]
 robot_index = 0
 interface_index = 1
 
+timeout = 0.02
+
+mailbox_out = {
+    robot_index: [],
+    interface_index: [],
+}
+
+mailbox_in = {
+    robot_index: [],
+    interface_index: [],
+}
+
+state = {
+    "waiting_for_image": False
+}
+
 
 class Callback:
     def __init__(self, condition, callback) -> None:
         self.condition = condition
         self.callback = callback
 
-    def test(self, msg) -> bool:
-        return self.condition(msg)
+    def test(self, socket, state, msg) -> bool:
+        return self.condition(socket, state, msg)
 
     async def execute(self, socket, msg) -> any:
         await self.callback(socket, msg)
 
 
+
 async def handler(socket, name, socket_index, on_close, string_callbacks: list[Callback], binary_callbacks: list[Callback]):
     # TODO: Refactor handler to classes
     global sockets
+    global mailbox_out
+    global state
 
     sockets[socket_index] = socket
+    mb_out = mailbox_out[socket_index]
+    mb_in = mailbox_in[socket_index]
+
     print(f"Client ({name}, {socket_index}) connected")
 
     while True:
+        # TODO: Dear god please refactor
         try:
-            msg = await socket.recv()
+            if mb_out:
+                await socket.send(mb_out.pop())
+                continue
+
+            if mb_in:
+                msg = mb_in.pop()
+
+            else:            
+                try:
+                    msg = await asyncio.wait_for(socket.recv(), timeout) 
+                except asyncio.TimeoutError:
+                    continue
+
 
             if isinstance(msg, str):
                 msg = msg.strip()
 
                 found = False
                 for cb in string_callbacks:
-                    if cb.test(msg):
+                    if cb.test(socket, state, msg):
                         await cb.execute(socket, msg)
                         found = True
                         break
@@ -49,6 +84,11 @@ async def handler(socket, name, socket_index, on_close, string_callbacks: list[C
                 print(f">> {name}: {msg}")
 
             elif isinstance(msg, bytes):
+                for cb in binary_callbacks:
+                    if cb.test(msg):
+                        await cb.execute(socket, msg)
+                        break
+
                 ...
                 # TODO: Handle that
 
@@ -58,30 +98,22 @@ async def handler(socket, name, socket_index, on_close, string_callbacks: list[C
             break
 
 
-async def robot_cam_callback(socket, msg):
-    await socket.send("cam")
-
-    res = await socket.recv()
-
-    if res == "fail":
-        print("Could not receive camera frame")
-        return
-
-    elif res != "ok":
-        print(f"Received invalid status message {res}")
-        return
-
+async def robot_img_callback(socket, msg):
+    print("Received image, storing to files")
     with open('cam_img.jpg', 'wb') as file:
-        file.write(await socket.recv())
+        file.write(msg[1:])
 
 
 async def interface_cam_callback(socket, msg):
     robot_socket = sockets[robot_index]
     if not robot_socket or robot_socket.closed:
+
         await socket.send("fail")
+        
         return
 
     await robot_socket.send("/cam")
+
     resp = await socket.recv()
 
     if resp == "fail":
@@ -94,9 +126,18 @@ async def interface_cam_callback(socket, msg):
     await socket.send(await robot_socket.recv())
 
 
+async def robot_img_test(socket, state, msg):
+    return state["waiting_for_image"] and msg[0] == 2
+
+
+async def interface_cam_test(socket, state, msg):
+    return msg == "/cam"
+
+
+
 robot_cam_request = Callback(
-    lambda msg: msg == "/cam",
-    robot_cam_callback
+    interface_cam_test,
+    robot_img_callback
 )
 
 
@@ -106,7 +147,7 @@ interface_cam_request = Callback(
 )
 
 async def robot_handler(socket):
-    await handler(socket, "robot", 0, None, [robot_cam_request], [])
+    await handler(socket, "robot", 0, None, [], [robot_cam_request])
 
 
 async def interface_handler(socket):

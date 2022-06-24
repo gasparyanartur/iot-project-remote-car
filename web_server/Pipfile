@@ -9,6 +9,8 @@ bitstring = "*"
 
 [dev-packages]
 autopep8 = "*"
+mypy = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.10"
