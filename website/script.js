@@ -14,6 +14,7 @@ const HiddenClass = "hidden";
 
 const connectButton = document.getElementById("connect-button");
 const camButton = document.getElementById("cam-button");
+const helloButton = document.getElementById("hello-button");
 const uriConnectButton = document.getElementById("uri-connect-button");
 const cameraDispay = document.getElementById("camera-display");
 const uriInputField = document.getElementById("uri-input");
@@ -139,6 +140,10 @@ uriConnectButton.addEventListener("click", async (context) => {
 camButton.addEventListener("click", (context) => {
     serverSocket.send("cam");
     globalThis.clientStatus = ClientStatus.WaitingForCameraStatus;
+});
+
+helloButton.addEventListener("click", (context) => {
+    serverSocket.send("hello");
 });
 
 connectButton.addEventListener("click", (context) => {

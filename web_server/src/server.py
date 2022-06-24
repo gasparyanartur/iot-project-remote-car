@@ -38,7 +38,6 @@ class Callback:
         await self.callback(socket, msg)
 
 
-
 async def handler(socket, name, socket_index, on_close, string_callbacks: list[Callback], binary_callbacks: list[Callback]):
     # TODO: Refactor handler to classes
     global sockets
@@ -61,12 +60,11 @@ async def handler(socket, name, socket_index, on_close, string_callbacks: list[C
             if mb_in:
                 msg = mb_in.pop()
 
-            else:            
+            else:
                 try:
-                    msg = await asyncio.wait_for(socket.recv(), timeout) 
+                    msg = await asyncio.wait_for(socket.recv(), timeout)
                 except asyncio.TimeoutError:
                     continue
-
 
             if isinstance(msg, str):
                 msg = msg.strip()
@@ -109,7 +107,7 @@ async def interface_cam_callback(socket, msg):
     if not robot_socket or robot_socket.closed:
 
         await socket.send("fail")
-        
+
         return
 
     await robot_socket.send("/cam")
@@ -134,7 +132,6 @@ async def interface_cam_test(socket, state, msg):
     return msg == "/cam"
 
 
-
 robot_cam_request = Callback(
     interface_cam_test,
     robot_img_callback
@@ -145,6 +142,7 @@ interface_cam_request = Callback(
     lambda msg: msg == "/cam",
     interface_cam_callback
 )
+
 
 async def robot_handler(socket):
     await handler(socket, "robot", 0, None, [], [robot_cam_request])
