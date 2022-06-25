@@ -57,6 +57,10 @@ def load_example_img():
         return img.read()
 
 
+def set_state(state: dict[str, any], name: str, value: bool) -> None:
+    state[name] = value
+
+
 class Callback:
     def __init__(self,
                  condition: TestType,
@@ -113,7 +117,7 @@ class Connection:
 
     async def _handler(self, socket: SocketType) -> None:
         self.socket = socket
-        print(f"Opened connection with {self.name}")
+        print(f"Opened connection with {self.name} at port {self.port}")
 
         while True:
             try:
@@ -175,25 +179,26 @@ def connection_factory():
                 Callback(
                     lambda c, m: (
                         c.state['waiting_for_img'] and
-                        isinstance(m, bytes) and
                         len(m) >= 2 and
                         m[0] == MessageTypes.data and
                         m[1] == DataTypes.image
                     ),
                     lambda c, m: (
-                        conns[ClientNames.interface].buffer(m)
-
+                        (
+                            conns[ClientNames.interface].buffer(m),
+                            set_state(state, 'waiting_for_img', False)
+                        )
                         if conns[ClientNames.interface].socket.open
-                        else do_nothing()
+                        else
+                        (
+                            print("Failed to send message over closed socket"),
+                            set_state(state, 'waiting_for_img', False)
+                        )
                     )
                 ),
                 Callback(
                     lambda c, m: isinstance(m, str),
                     lambda c, m: print_incoming_message(c, m)
-                ),
-                Callback(
-                    lambda c, m: True,
-                    lambda c, m: print(f"Debug: {m}")
                 ),
             ],
         )
@@ -224,19 +229,9 @@ def connection_factory():
                         m[2] == DataTypes.image
                     ),
                     lambda c, m: (
-                        print("bout to request some images..."),
-                        img := load_example_img(),
-                        msg := struct.pack(f"!BB{len(img)}s",
-                                           MessageTypes.data,
-                                           DataTypes.image,
-                                           img
-                                           ),
-                        conns[ClientNames.interface].buffer(msg)
+                        set_state(state, 'waiting_for_img', True),
+                        conns[ClientNames.robot].buffer(m)
                     )
-                ),
-                Callback(
-                    lambda c, m: True,
-                    lambda c, m: print(f"Debug: {m}")
                 ),
             ],
         )

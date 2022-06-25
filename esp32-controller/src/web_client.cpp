@@ -2,26 +2,32 @@
 #include <ArduinoWebsockets.h>
 #include <WiFi.h>
 
+#include <Esp.h>
+
 #include "web_client.h"
 #include "esp_camera.h"
 #include "message_types.h"
 
-const char NW_SSID[] = "Artur";
-const char NW_PW[] = "23D3037900C64";
-const char SOCKET_URI[] = "ws://192.168.1.104:8001";
 
-websockets::WebsocketsClient client;
 
 void onMessageCallback(websockets::WebsocketsMessage message);
 void onEventCallback(websockets::WebsocketsEvent event, String data);
 bool connectToWifi();
 void sendCameraCapture();
-void onTextMessageCallback(const String msg);
-void onBinaryMessageCallback(const byte data[], const size_t length);
-void handleBinaryRequest(const byte data[], const size_t length);
-void handleUnknownBinaryMessage(const byte data[], const size_t length);
-void handleBinaryDataRequest(const byte data[], const size_t length);
-void handleUnknownBinaryDataRequest(const byte data[], const size_t length);
+inline void onTextMessageCallback(const String msg);
+inline void onBinaryMessageCallback(const byte data[], const size_t length);
+inline void handleBinaryRequest(const byte data[], const size_t length);
+inline void handleUnknownBinaryMessage(const byte data[], const size_t length);
+inline void handleBinaryDataRequest(const byte data[], const size_t length);
+inline void handleBinaryDataImageRequest(const byte data[], const size_t length);
+inline void handleUnknownBinaryRequest(const byte data[], const size_t length);
+inline void handleUnknownBinaryDataRequest(const byte data[], const size_t length);
+
+const char NW_SSID[] = "Artur";
+const char NW_PW[] = "23D3037900C64";
+const char SOCKET_URI[] = "ws://192.168.1.104:8002";
+
+websockets::WebsocketsClient client;
 
 void startWebClient()
 {
@@ -76,29 +82,6 @@ void onMessageCallback(websockets::WebsocketsMessage message)
    else if (message.isText())
       onTextMessageCallback(message.data());
 
-   if (message.data() == "cam")
-   {
-      auto sns = esp_camera_sensor_get();
-      camera_fb_t *fb = esp_camera_fb_get();
-      if (!fb)
-      {
-         Serial.println("Camera capture failed");
-         client.send("fail");
-         return;
-      }
-
-      const size_t msgLen = fb->len + 2;
-      char msg[msgLen];
-
-      msg[0] = MessageHeader::MessageType::Data;
-      msg[1] = MessageHeader::DataType::Image;
-
-      std::copy(fb->buf, fb->buf + fb->len, msg + 2);
-
-      client.sendBinary(msg, msgLen);
-
-      esp_camera_fb_return(fb);
-   }
 }
 
 void onEventCallback(websockets::WebsocketsEvent event, String data)
@@ -137,11 +120,11 @@ WIFI_CONNECTED:
    return true;
 }
 
-void onTextMessageCallback(const String msg)
+inline void onTextMessageCallback(const String msg)
 {
 }
 
-void onBinaryMessageCallback(const byte data[], const size_t length)
+inline void onBinaryMessageCallback(const byte data[], const size_t length)
 {
    const byte messageType = data[0];
    switch (messageType)
@@ -162,7 +145,7 @@ void onBinaryMessageCallback(const byte data[], const size_t length)
    }
 }
 
-void handleBinaryRequest(const byte data[], const size_t length)
+inline void handleBinaryRequest(const byte data[], const size_t length)
 {
    const byte requestType = data[0];
    switch (requestType)
@@ -179,7 +162,7 @@ void handleBinaryRequest(const byte data[], const size_t length)
    }
 }
 
-void handleBinaryDataRequest(const byte data[], const size_t length)
+inline void handleBinaryDataRequest(const byte data[], const size_t length)
 {
    const byte dataType = data[0];
    switch (dataType)
@@ -194,38 +177,44 @@ void handleBinaryDataRequest(const byte data[], const size_t length)
    }
 }
 
-void handleBinaryDataImageRequest(const byte data[], const size_t length)
+inline void handleBinaryDataImageRequest(const byte data[], const size_t length)
 {
-      camera_fb_t *fb = esp_camera_fb_get();
-      if (!fb)
-      {
-         Serial.println("Camera capture failed");
-         return;
-      }
+   Serial.println("Capturing camera frame...");
+   auto sns = esp_camera_sensor_get();
+   camera_fb_t *fb = esp_camera_fb_get();
+   if (!fb)
+   {
+      Serial.println("Camera capture failed");
+      return;
+   }
+   Serial.println("Frame captured successfully.");
 
-      const size_t msgLen = fb->len + 2;
-      char msg[msgLen];
+   Serial.println("Packing frame...");
 
-      msg[0] = MessageHeader::MessageType::Data;
-      msg[1] = MessageHeader::DataType::Image;
-      std::copy(fb->buf, fb->buf + fb->len, msg + 2);
+   char* c = new char[fb->len+2];
 
-      client.sendBinary(msg, msgLen);
-      esp_camera_fb_return(fb);
+   c[0] = MessageHeader::MessageType::Data;
+   c[1] = MessageHeader::DataType::Image;
+
+   std::copy(fb->buf, fb->buf + fb->len, c + 2);
+   client.sendBinary(c, fb->len+2);
+
+   delete [] c;
+   
+   esp_camera_fb_return(fb);
 }
 
-void handleUnknownBinaryMessage(const byte data[], const size_t length)
+inline void handleUnknownBinaryMessage(const byte data[], const size_t length)
 {
    Serial.printf("Received unrecognized message of type %d%n", data[0]);
 }
 
-void handleUnknownBinaryRequest(const byte data[], const size_t length)
+inline void handleUnknownBinaryRequest(const byte data[], const size_t length)
 {
    Serial.printf("Received unrecognized request of type %d%n", data[0]);
 }
 
-void handleUnknownBinaryDataRequest(const byte data[], const size_t length)
+inline void handleUnknownBinaryDataRequest(const byte data[], const size_t length)
 {
    Serial.printf("Received request for unrecognized type %d%n", data[0]);
 }
-

@@ -22,7 +22,6 @@
     "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
     "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
     "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
-    "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/config",
     "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
     "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
     "C:/Users/gaspa/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include/esp_additions/freertos",

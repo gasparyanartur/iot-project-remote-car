@@ -119,13 +119,16 @@ function cleanUpCurrentImage() {
 } 
 
 async function handleWaitingForCameraFrame(message) {
+    console.log("KAH!");
     const header = new Int8Array(message, 0, 2);
     const data = new Uint8Array(message, 2);
+    console.log(`Header: ${header}`)
 
     if (header[0] == 2 && header[1] == 1) {
         cleanUpCurrentImage();
         const blob = new Blob([data], {type: 'image/jpeg'});
         const url = URL.createObjectURL(blob);
+        console.log("Created url at ")
         const cameraImage = document.getElementById("camera-img");
         const width = cameraImage.width;
         cameraImage.src = url;
