@@ -23,6 +23,8 @@ let currentState = State.Entry;
 let serverSocket = null;
 let clientStatus = ClientStatus.Idle;
 
+let currentImageURL = null;
+
 function initiate() {
     Array.from(document.getElementsByClassName(ActivityStateClass)).forEach(element => {
         if (element.classList.contains(currentState))
@@ -65,13 +67,6 @@ async function connectToServer(socket, timeout = 2000) {
 }
 
 function loadActiveMenu() {
-    /*
-    serverSocket.addEventListener("message", event => {
-        if (clientStatus === ClientStatus.WaitingForCamera) {
-
-        }
-    });
-    */
     updateCurrentState(State.Active);
 }
 
@@ -81,17 +76,17 @@ function logInvalidMessage(message) {
 }
 
 function handleMessage(message) {
-    console.log("Received message " + message.data);
-    switch(clientStatus) {
+    console.log(`Received message ${message.data}`);
+    switch(globalThis.clientStatus) {
         case ClientStatus.Idle:
             break;
 
         case ClientStatus.WaitingForCameraStatus:
-            handleWaitingForCameraStatus(message);
+            handleWaitingForCameraStatus(message.data);
             break;
 
         case ClientStatus.WaitingForCameraFrame:
-            handleWaitingForCameraFrame(message);
+            handleWaitingForCameraFrame(message.data);
             break;
 
         default:
@@ -116,9 +111,27 @@ function handleWaitingForCameraStatus(message) {
     }
 }
 
-function handleWaitingForCameraFrame(message) {
-    const img = btoa(message.data);
-    console.log(img);
+function cleanUpCurrentImage() {
+    if (globalThis.currentImageURL !== null) {
+        URL.revokeObjectURL(globalThis.currentImageURL);
+        globalThis.currentImageURL = null;
+    }
+} 
+
+async function handleWaitingForCameraFrame(message) {
+    const header = new Int8Array(message, 0, 2);
+    const data = new Uint8Array(message, 2);
+
+    if (header[0] == 2 && header[1] == 1) {
+        cleanUpCurrentImage();
+        const blob = new Blob([data], {type: 'image/jpeg'});
+        const url = URL.createObjectURL(blob);
+        const cameraImage = document.getElementById("camera-img");
+        const width = cameraImage.width;
+        cameraImage.src = url;
+        cameraImage.width = width;
+    }
+
 }
 
 
@@ -127,6 +140,7 @@ uriConnectButton.addEventListener("click", async (context) => {
     const inputContent = uriInputField.value;
 
     serverSocket = new WebSocket(inputContent);
+    serverSocket.binaryType = "arraybuffer";
     const success = await connectToServer(serverSocket, 2000);
     if (success) {
         console.log(`Successfully connected to server at URL: {serverSocket.url}`);
@@ -138,15 +152,8 @@ uriConnectButton.addEventListener("click", async (context) => {
 });
 
 camButton.addEventListener("click", (context) => {
-    //serverSocket.send("cam");
-    const msgBuffer = new ArrayBuffer(4);
-    const view = new Int8Array(msgBuffer);
-
-    view[0] = 0;
-    view[1] = 1;
-    view[2] = 1;
-
-    serverSocket.send(view.buffer);
+    const request = new Uint8Array([0, 1, 1]);
+    serverSocket.send(request);
     globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
 });
 
