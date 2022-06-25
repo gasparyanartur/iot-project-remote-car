@@ -1,10 +1,9 @@
 from __future__ import annotations
-from dataclasses import dataclass
-from email import header
 
 from typing import Callable
 import websockets
 import asyncio
+import struct
 
 MessageType = str | bytes
 SocketType = websockets.WebSocketServerProtocol
@@ -13,20 +12,32 @@ TestType = Callable[['Connection', SocketType, MessageType], bool]
 CallbackType = Callable[['Connection', SocketType, MessageType], None]
 
 
-@dataclass(frozen=True, slots=True)
-class Constants:
-    INTER_CONN_NAME: str = "interface"
-    ROBOT_CONN_NAME: str = "robot"
+class ClientNames:
+    __slots__ = tuple()
+
+    interface: str = "interface"
+    robot: str = "robot"
 
 
-@dataclass(frozen=True, slots=True)
-class MessageHeaders:
-    REQUEST_TYPE: int = 1
-    IMG_TYPE: int = 4
+class MessageTypes:
+    __slots__ = tuple()
+
+    request: int = 0
+    status: int = 1
+    data: int = 2
+    command: int = 3
 
 
-Const = Constants()
-MsgHeaders = MessageHeaders()
+class RequestTypes:
+    __slots__ = tuple()
+
+    data: int = 1
+
+
+class DataTypes:
+    __slots__ = tuple()
+
+    image: int = 1
 
 
 def do_nothing() -> None:
@@ -39,6 +50,11 @@ def is_binary_header(msg: MessageType, msg_type: int) -> bool:
 
 def print_incoming_message(conn: 'Connection', msg: MessageType) -> None:
     print(f">> {conn.name}: {msg}")
+
+
+def load_example_img():
+    with open('cat.jpg', 'rb') as img:
+        return img.read()
 
 
 class Callback:
@@ -97,6 +113,7 @@ class Connection:
 
     async def _handler(self, socket: SocketType) -> None:
         self.socket = socket
+        print(f"Opened connection with {self.name}")
 
         while True:
             try:
@@ -150,7 +167,7 @@ def connection_factory():
         conns: dict[str, Connection]
     ) -> Connection:
         robot_conn = Connection(
-            Const.ROBOT_CONN_NAME,
+            ClientNames.robot,
             "192.168.1.104",
             8002,
             state,
@@ -158,12 +175,15 @@ def connection_factory():
                 Callback(
                     lambda c, m: (
                         c.state['waiting_for_img'] and
-                        is_binary_header(m, MsgHeaders.IMG_TYPE)
+                        isinstance(m, bytes) and
+                        len(m) >= 2 and
+                        m[0] == MessageTypes.data and
+                        m[1] == DataTypes.image
                     ),
                     lambda c, m: (
-                        conns[Const.INTER_CONN_NAME].buffer(m)
+                        conns[ClientNames.interface].buffer(m)
 
-                        if conns[Const.INTER_CONN_NAME].socket.open
+                        if conns[ClientNames.interface].socket.open
                         else do_nothing()
                     )
                 ),
@@ -181,11 +201,11 @@ def connection_factory():
         return robot_conn
 
     def interface_connection_factory(
-        connections: dict[str, Connection]
+        conns: dict[str, Connection]
     ) -> Connection:
 
         inter_conn = Connection(
-            Const.INTER_CONN_NAME,
+            ClientNames.interface,
             "192.168.1.104",
             8001,
             state,
@@ -195,8 +215,24 @@ def connection_factory():
                     lambda c, m: print_incoming_message(c, m)
                 ),
                 Callback(
-                    lambda c, m: is_binary_header(m, MsgHeaders.REQUEST_TYPE),
-                    lambda c, m: print(f"Request: {m[1]}")
+                    lambda c, m: (
+                        not state['waiting_for_img'] and
+                        isinstance(m, bytes) and
+                        len(m) >= 2 and
+                        m[0] == MessageTypes.request and
+                        m[1] == RequestTypes.data and
+                        m[2] == DataTypes.image
+                    ),
+                    lambda c, m: (
+                        print("bout to request some images..."),
+                        img := load_example_img(),
+                        msg := struct.pack(f"!BB{len(img)}s",
+                                           MessageTypes.data,
+                                           DataTypes.image,
+                                           img
+                                           ),
+                        conns[ClientNames.interface].buffer(msg)
+                    )
                 ),
                 Callback(
                     lambda c, m: True,
@@ -210,8 +246,8 @@ def connection_factory():
     robot_conn = robot_connection_factory(connections)
     inter_conn = interface_connection_factory(connections)
 
-    connections[Const.ROBOT_CONN_NAME] = robot_conn
-    connections[Const.INTER_CONN_NAME] = inter_conn
+    connections[ClientNames.robot] = robot_conn
+    connections[ClientNames.interface] = inter_conn
 
     return connections
 
@@ -223,8 +259,8 @@ def initiate_server():
     asyncio.set_event_loop(event_loop)
 
     routines = [
-        connections[Const.ROBOT_CONN_NAME].start(),
-        connections[Const.INTER_CONN_NAME].start()
+        connections[ClientNames.robot].start(),
+        connections[ClientNames.interface].start()
     ]
     try:
         event_loop.run_until_complete(asyncio.gather(*routines))

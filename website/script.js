@@ -142,11 +142,12 @@ camButton.addEventListener("click", (context) => {
     const msgBuffer = new ArrayBuffer(4);
     const view = new Int8Array(msgBuffer);
 
-    view[0] = 1;
-    view[1] = 2;
+    view[0] = 0;
+    view[1] = 1;
+    view[2] = 1;
 
     serverSocket.send(view.buffer);
-    globalThis.clientStatus = ClientStatus.WaitingForCameraStatus;
+    globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
 });
 
 helloButton.addEventListener("click", (context) => {

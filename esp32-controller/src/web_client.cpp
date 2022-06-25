@@ -16,7 +16,12 @@ void onMessageCallback(websockets::WebsocketsMessage message);
 void onEventCallback(websockets::WebsocketsEvent event, String data);
 bool connectToWifi();
 void sendCameraCapture();
-static size_t encodeJpgCallback(void *rawClient, size_t index, const void *data, size_t length);
+void onTextMessageCallback(const String msg);
+void onBinaryMessageCallback(const byte data[], const size_t length);
+void handleBinaryRequest(const byte data[], const size_t length);
+void handleUnknownBinaryMessage(const byte data[], const size_t length);
+void handleBinaryDataRequest(const byte data[], const size_t length);
+void handleUnknownBinaryDataRequest(const byte data[], const size_t length);
 
 void startWebClient()
 {
@@ -62,6 +67,15 @@ void updateWebClient()
 
 void onMessageCallback(websockets::WebsocketsMessage message)
 {
+   if (message.isEmpty())
+      return;
+
+   if (message.isBinary())
+      onBinaryMessageCallback((const byte *)message.rawData().c_str(), message.length());
+
+   else if (message.isText())
+      onTextMessageCallback(message.data());
+
    if (message.data() == "cam")
    {
       auto sns = esp_camera_sensor_get();
@@ -73,13 +87,15 @@ void onMessageCallback(websockets::WebsocketsMessage message)
          return;
       }
 
-      const size_t msgLen = fb->len + 1;
+      const size_t msgLen = fb->len + 2;
       char msg[msgLen];
 
-      msg[0] = MessageType::IMAGE_TYPE;
-      std::copy(fb->buf, fb->buf + fb->len, msg + 1);
+      msg[0] = MessageHeader::MessageType::Data;
+      msg[1] = MessageHeader::DataType::Image;
 
-      client.sendBinary(msg, fb->len + 1);
+      std::copy(fb->buf, fb->buf + fb->len, msg + 2);
+
+      client.sendBinary(msg, msgLen);
 
       esp_camera_fb_return(fb);
    }
@@ -120,3 +136,96 @@ WIFI_CONNECTED:
    Serial.printf("\nSuccessfully connected to address: %s\n", WiFi.localIP().toString());
    return true;
 }
+
+void onTextMessageCallback(const String msg)
+{
+}
+
+void onBinaryMessageCallback(const byte data[], const size_t length)
+{
+   const byte messageType = data[0];
+   switch (messageType)
+   {
+   case MessageHeader::MessageType::Request:
+      break;
+
+   default:
+      handleUnknownBinaryMessage(data, length);
+   }
+   if (data[0] == MessageHeader::MessageType::Request)
+   {
+      handleBinaryRequest(data + 1, length - 1);
+   }
+   else
+   {
+      Serial.printf("Unrecognized request: %d\n", data[0]);
+   }
+}
+
+void handleBinaryRequest(const byte data[], const size_t length)
+{
+   const byte requestType = data[0];
+   switch (requestType)
+   {
+
+   case MessageHeader::RequestType::Data:
+      // TODO
+      handleBinaryDataRequest(data + 1, length - 1);
+      break;
+
+   default:
+      handleUnknownBinaryRequest(data, length);
+      break;
+   }
+}
+
+void handleBinaryDataRequest(const byte data[], const size_t length)
+{
+   const byte dataType = data[0];
+   switch (dataType)
+   {
+   case MessageHeader::DataType::Image:
+      handleBinaryDataImageRequest(data + 1, length - 1);
+      break;
+
+   default:
+      handleUnknownBinaryDataRequest(data, length);
+      break;
+   }
+}
+
+void handleBinaryDataImageRequest(const byte data[], const size_t length)
+{
+      camera_fb_t *fb = esp_camera_fb_get();
+      if (!fb)
+      {
+         Serial.println("Camera capture failed");
+         return;
+      }
+
+      const size_t msgLen = fb->len + 2;
+      char msg[msgLen];
+
+      msg[0] = MessageHeader::MessageType::Data;
+      msg[1] = MessageHeader::DataType::Image;
+      std::copy(fb->buf, fb->buf + fb->len, msg + 2);
+
+      client.sendBinary(msg, msgLen);
+      esp_camera_fb_return(fb);
+}
+
+void handleUnknownBinaryMessage(const byte data[], const size_t length)
+{
+   Serial.printf("Received unrecognized message of type %d%n", data[0]);
+}
+
+void handleUnknownBinaryRequest(const byte data[], const size_t length)
+{
+   Serial.printf("Received unrecognized request of type %d%n", data[0]);
+}
+
+void handleUnknownBinaryDataRequest(const byte data[], const size_t length)
+{
+   Serial.printf("Received request for unrecognized type %d%n", data[0]);
+}
+
