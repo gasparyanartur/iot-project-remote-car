@@ -138,7 +138,14 @@ uriConnectButton.addEventListener("click", async (context) => {
 });
 
 camButton.addEventListener("click", (context) => {
-    serverSocket.send("cam");
+    //serverSocket.send("cam");
+    const msgBuffer = new ArrayBuffer(4);
+    const view = new Int8Array(msgBuffer);
+
+    view[0] = 1;
+    view[1] = 2;
+
+    serverSocket.send(view.buffer);
     globalThis.clientStatus = ClientStatus.WaitingForCameraStatus;
 });
 

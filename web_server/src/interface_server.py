@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from email import header
 
 from typing import Callable
 import websockets
@@ -20,6 +21,7 @@ class Constants:
 
 @dataclass(frozen=True, slots=True)
 class MessageHeaders:
+    REQUEST_TYPE: int = 1
     IMG_TYPE: int = 4
 
 
@@ -103,6 +105,7 @@ class Connection:
             except websockets.ConnectionClosedOK:
                 print(f"Connection with {self.name} closed")
                 await self._on_close()
+                break
 
     async def _event_frame(self) -> None:
         if self.mailbox_out:
@@ -132,10 +135,9 @@ class Connection:
         for cb in self.callbacks:
             if cb.test(self, message):
                 await cb.execute(self, message)
-                return
 
     async def _on_close(self):
-        ...
+        self.socket.reconnect()
 
 
 def connection_factory():
@@ -168,7 +170,11 @@ def connection_factory():
                 Callback(
                     lambda c, m: isinstance(m, str),
                     lambda c, m: print_incoming_message(c, m)
-                )
+                ),
+                Callback(
+                    lambda c, m: True,
+                    lambda c, m: print(f"Debug: {m}")
+                ),
             ],
         )
 
@@ -187,7 +193,15 @@ def connection_factory():
                 Callback(
                     lambda c, m: isinstance(m, str),
                     lambda c, m: print_incoming_message(c, m)
-                )
+                ),
+                Callback(
+                    lambda c, m: is_binary_header(m, MsgHeaders.REQUEST_TYPE),
+                    lambda c, m: print(f"Request: {m[1]}")
+                ),
+                Callback(
+                    lambda c, m: True,
+                    lambda c, m: print(f"Debug: {m}")
+                ),
             ],
         )
 
