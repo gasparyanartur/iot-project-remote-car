@@ -8,6 +8,7 @@
     <title>Autorobot</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer="true"></script>
+    <script src="map.js" defer="true"></script>
 </head>
 
 <body>
@@ -15,7 +16,7 @@
         <nav>
             <button id="connect-button" class="activity-state entry-state">Connection</button>
             <button id="cam-button" class="activity-state active-state">Camera</button>
-            <button id="hello-button" class="activity-state active-state">Hello</button>
+            <button id="map-button" class="activity-state active-state">Map</button>
         </nav>
 
         <section id="menu">
@@ -23,10 +24,16 @@
                 <span><span>URI: </span><input id="uri-input"><button id="uri-connect-button">Connect</button></span>
             </div>
 
-            <div id="camera-menu" class="activity-state active-state">
+            <div id="camera-menu" class="activity-state active-state active-menu">
+                <button id="capture-button">Capture</button>
+                <button id="hello-button">Hello</button>
                 <div id="camera-frame">
                     <img id="camera-img" width="600px">
                 </div>
+            </div>
+
+            <div id="map-menu" class="activity-state active-state active-menu">
+                <canvas id="map-canvas" width="400px" height="400px"></canvas>
             </div>
 
         </section>

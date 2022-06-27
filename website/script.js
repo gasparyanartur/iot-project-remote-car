@@ -3,6 +3,11 @@ const State = {
     Active: "active-state",
 }
 
+const ActiveMenu = {
+    Camera: "camera-menu",
+    Map: "map-menu",
+}
+
 const ClientStatus = {
     Idle: 0,
     WaitingForCameraStatus: 1,
@@ -14,14 +19,17 @@ const HiddenClass = "hidden";
 
 const connectButton = document.getElementById("connect-button");
 const camButton = document.getElementById("cam-button");
+const mapButton = document.getElementById("map-button");
 const helloButton = document.getElementById("hello-button");
 const uriConnectButton = document.getElementById("uri-connect-button");
 const cameraDispay = document.getElementById("camera-display");
 const uriInputField = document.getElementById("uri-input");
 
-const menuStateCheatlist = document.getElementById("menu-state-cheatlist");
+const stateCheatList = document.getElementById("menu-state-cheatlist");
+const captureButton = document.getElementById("capture-button");
 
 let currentState = State.Entry;
+let currentActiveMenu = ActiveMenu.Camera;
 let serverSocket = null;
 let clientStatus = ClientStatus.Idle;
 
@@ -34,9 +42,6 @@ function initiate() {
         else
             element.classList.add(HiddenClass);
     });
-
-
-
 
     updateCurrentState(State.Active);
 }
@@ -54,6 +59,17 @@ function updateCurrentState(newState) {
     Array.from(document.getElementsByClassName(currentState)).forEach(element => {
         element.classList.remove(HiddenClass);
     });
+}
+
+function updateActiveMenu(newMenu) {
+    if (newMenu == currentActiveMenu)
+        return;
+
+    document.getElementById(currentActiveMenu).classList.add(HiddenClass);
+
+    currentActiveMenu = newMenu;
+
+    document.getElementById(currentActiveMenu).classList.remove(HiddenClass);
 }
 
 async function connectToServer(socket, timeout = 2000) {
@@ -160,7 +176,7 @@ uriConnectButton.addEventListener("click", async (context) => {
         console.log("Failed to connect");
 });
 
-camButton.addEventListener("click", (context) => {
+captureButton.addEventListener("click", (context) => {
     const request = new Uint8Array([0, 1, 1]);
     serverSocket.send(request);
     globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
@@ -174,12 +190,21 @@ connectButton.addEventListener("click", (context) => {
 
 });
 
-menuStateCheatlist.childNodes.forEach(child => {
+stateCheatList.childNodes.forEach(child => {
     child.addEventListener('click', (context) => {
         const stateName = context.target.textContent;
         const state = State[stateName];
         updateCurrentState(state);
     });
+});
+
+
+camButton.addEventListener('click', context => {
+    updateActiveMenu(ActiveMenu.Camera);
+});
+
+mapButton.addEventListener('click', context => {
+    updateActiveMenu(ActiveMenu.Map);
 });
 
 initiate();
