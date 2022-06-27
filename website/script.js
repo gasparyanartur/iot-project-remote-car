@@ -19,6 +19,8 @@ const uriConnectButton = document.getElementById("uri-connect-button");
 const cameraDispay = document.getElementById("camera-display");
 const uriInputField = document.getElementById("uri-input");
 
+const menuStateCheatlist = document.getElementById("menu-state-cheatlist");
+
 let currentState = State.Entry;
 let serverSocket = null;
 let clientStatus = ClientStatus.Idle;
@@ -32,6 +34,11 @@ function initiate() {
         else
             element.classList.add(HiddenClass);
     });
+
+
+
+
+    updateCurrentState(State.Active);
 }
 
 function updateCurrentState(newState) {
@@ -67,17 +74,17 @@ async function connectToServer(socket, timeout = 2000) {
 }
 
 function loadActiveMenu() {
-    updateCurrentState(State.Active);
+    updateCurrentState(State.Entry);
 }
 
 
 function logInvalidMessage(message) {
-    console.log(`Received invalid message {message.data} for status {clientStatus}`);
+    console.log(`Received invalid message ${message.data} for status {clientStatus}`);
 }
 
 function handleMessage(message) {
     console.log(`Received message ${message.data}`);
-    switch(globalThis.clientStatus) {
+    switch (globalThis.clientStatus) {
         case ClientStatus.Idle:
             break;
 
@@ -116,17 +123,16 @@ function cleanUpCurrentImage() {
         URL.revokeObjectURL(globalThis.currentImageURL);
         globalThis.currentImageURL = null;
     }
-} 
+}
 
 async function handleWaitingForCameraFrame(message) {
-    console.log("KAH!");
     const header = new Int8Array(message, 0, 2);
     const data = new Uint8Array(message, 2);
     console.log(`Header: ${header}`)
 
     if (header[0] == 2 && header[1] == 1) {
         cleanUpCurrentImage();
-        const blob = new Blob([data], {type: 'image/jpeg'});
+        const blob = new Blob([data], { type: 'image/jpeg' });
         const url = URL.createObjectURL(blob);
         console.log("Created url at ")
         const cameraImage = document.getElementById("camera-img");
@@ -166,6 +172,14 @@ helloButton.addEventListener("click", (context) => {
 
 connectButton.addEventListener("click", (context) => {
 
+});
+
+menuStateCheatlist.childNodes.forEach(child => {
+    child.addEventListener('click', (context) => {
+        const stateName = context.target.textContent;
+        const state = State[stateName];
+        updateCurrentState(state);
+    });
 });
 
 initiate();

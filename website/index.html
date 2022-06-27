@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer="true"></script>
 </head>
+
 <body>
     <main>
         <nav>
@@ -15,6 +17,7 @@
             <button id="cam-button" class="activity-state active-state">Camera</button>
             <button id="hello-button" class="activity-state active-state">Hello</button>
         </nav>
+
         <section id="menu">
             <div class="activity-state entry-state" id="connection-menu">
                 <span><span>URI: </span><input id="uri-input"><button id="uri-connect-button">Connect</button></span>
@@ -25,9 +28,17 @@
                     <img id="camera-img" width="600px">
                 </div>
             </div>
-        </section> 
-    </main>
 
+        </section>
+    </main>
+    <section id="sidebar">
+        <ul id="menu-state-cheatlist">Menu State
+            <li><button>Entry</button></li>
+            <li><button>Active</button></li>
+        </ul>
+        
+    </section>
 
 </body>
+
 </html>

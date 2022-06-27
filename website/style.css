@@ -3,19 +3,21 @@ body {
     display: flex;
     height: 95vh;
     width: 100vw;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     padding-top: 2%;
     margin: 0;
 }
 
 main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
     background-color: yellowgreen;
     align-self: center;
-    height: 90%;
+    height: 90vh;
     width: 90%;
-    top: 5%;
-    
+    top: 5vh;
 }
 
 #map {
@@ -32,4 +34,12 @@ main {
     width: 600px;
     height: 450px;
     background-color: white;
+}
+
+#sidebar {
+    position: relative;
+    height: 90vh;
+    background-color: red;
+    order: -1;
+    top: 5vh;
 }
