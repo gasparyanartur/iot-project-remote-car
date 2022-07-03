@@ -70,6 +70,12 @@ function updateActiveMenu(newMenu) {
     currentActiveMenu = newMenu;
 
     document.getElementById(currentActiveMenu).classList.remove(HiddenClass);
+
+    switch(newMenu) {
+        case ActiveMenu.Map:
+            map.render();
+            break;
+    }
 }
 
 async function connectToServer(socket, timeout = 2000) {
