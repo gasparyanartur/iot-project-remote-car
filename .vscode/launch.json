@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "c:/Users/gaspa/dev/embedded/car-project/esp32-controller",
-      "program": "c:/Users/gaspa/dev/embedded/car-project/esp32-controller/build/Debug/outDebug",
+      "cwd": "c:/Users/gaspa/Dev/embedded/mobile-robot-car/control-server/src",
+      "program": "c:/Users/gaspa/Dev/embedded/mobile-robot-car/control-server/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

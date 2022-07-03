@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Callable
 import websockets
 import asyncio
-import struct
+
+from message_types import DataTypes, MessageTypes, RequestTypes
 
 MessageType = str | bytes
 SocketType = websockets.WebSocketServerProtocol
@@ -17,27 +18,6 @@ class ClientNames:
 
     interface: str = "interface"
     robot: str = "robot"
-
-
-class MessageTypes:
-    __slots__ = tuple()
-
-    request: int = 0
-    status: int = 1
-    data: int = 2
-    command: int = 3
-
-
-class RequestTypes:
-    __slots__ = tuple()
-
-    data: int = 1
-
-
-class DataTypes:
-    __slots__ = tuple()
-
-    image: int = 1
 
 
 def do_nothing() -> None:
