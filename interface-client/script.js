@@ -43,7 +43,66 @@ function initiate() {
             element.classList.add(HiddenClass);
     });
 
+    uriConnectButton.addEventListener("click", async (context) => {
+        // TODO: Validate input
+        const inputContent = uriInputField.value;
+
+        serverSocket = new WebSocket(inputContent);
+        serverSocket.binaryType = "arraybuffer";
+        const success = await connectToServer(serverSocket, 2000);
+        if (success) {
+            console.log(`Successfully connected to server at URL: {serverSocket.url}`);
+            loadActiveMenu();
+            serverSocket.onmessage = handleMessage;
+        }
+        else
+            console.log("Failed to connect");
+    });
+
+    captureButton.addEventListener("click", (context) => {
+        const request = new Uint8Array([0, 1, 1]);
+        serverSocket.send(request);
+        globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
+    });
+
+    helloButton.addEventListener("click", (context) => {
+        serverSocket.send("hello");
+    });
+
+    connectButton.addEventListener("click", (context) => {
+
+    });
+
+    stateCheatList.childNodes.forEach(child => {
+        child.addEventListener('click', (context) => {
+            const stateName = context.target.textContent;
+            const state = State[stateName];
+            updateCurrentState(state);
+        });
+    });
+
+
+    camButton.addEventListener('click', context => {
+        updateActiveMenu(ActiveMenu.Camera);
+    });
+
+    mapButton.addEventListener('click', context => {
+        updateActiveMenu(ActiveMenu.Map);
+    });
+
+    map.canvas.addEventListener('click', context => {
+        console.log("abc");
+    });
+
     updateCurrentState(State.Active);
+    updateActiveMenu(ActiveMenu.Camera);
+}
+
+function initiateState(state) {
+    switch (state) {
+        default:
+            break;
+    }
 }
 
 function updateCurrentState(newState) {
@@ -59,6 +118,17 @@ function updateCurrentState(newState) {
     Array.from(document.getElementsByClassName(currentState)).forEach(element => {
         element.classList.remove(HiddenClass);
     });
+
+    initiateState(newState);
+}
+
+function initateMenu(menu) {
+    switch (menu) {
+        case ActiveMenu.Map:
+            map.render();
+        default:
+            break;
+    }
 }
 
 function updateActiveMenu(newMenu) {
@@ -71,11 +141,7 @@ function updateActiveMenu(newMenu) {
 
     document.getElementById(currentActiveMenu).classList.remove(HiddenClass);
 
-    switch(newMenu) {
-        case ActiveMenu.Map:
-            map.render();
-            break;
-    }
+    initateMenu(newMenu);
 }
 
 async function connectToServer(socket, timeout = 2000) {
@@ -166,51 +232,6 @@ async function handleWaitingForCameraFrame(message) {
 }
 
 
-uriConnectButton.addEventListener("click", async (context) => {
-    // TODO: Validate input
-    const inputContent = uriInputField.value;
 
-    serverSocket = new WebSocket(inputContent);
-    serverSocket.binaryType = "arraybuffer";
-    const success = await connectToServer(serverSocket, 2000);
-    if (success) {
-        console.log(`Successfully connected to server at URL: {serverSocket.url}`);
-        loadActiveMenu();
-        serverSocket.onmessage = handleMessage;
-    }
-    else
-        console.log("Failed to connect");
-});
-
-captureButton.addEventListener("click", (context) => {
-    const request = new Uint8Array([0, 1, 1]);
-    serverSocket.send(request);
-    globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
-});
-
-helloButton.addEventListener("click", (context) => {
-    serverSocket.send("hello");
-});
-
-connectButton.addEventListener("click", (context) => {
-
-});
-
-stateCheatList.childNodes.forEach(child => {
-    child.addEventListener('click', (context) => {
-        const stateName = context.target.textContent;
-        const state = State[stateName];
-        updateCurrentState(state);
-    });
-});
-
-
-camButton.addEventListener('click', context => {
-    updateActiveMenu(ActiveMenu.Camera);
-});
-
-mapButton.addEventListener('click', context => {
-    updateActiveMenu(ActiveMenu.Map);
-});
 
 initiate();

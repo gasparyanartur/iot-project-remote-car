@@ -49,5 +49,5 @@ const map = (() => {
 
     ctx.stroke();
 
-    return { width, height, getCell, setCell, setRect, render};
+    return { width, height, getCell, setCell, setRect, render, canvas};
 })();
