@@ -1,0 +1,24 @@
+start info
+
+scale = 1:50
+zoom = 100%
+pixel_to_cm: 39.75
+
+height_total = 500px
+width_total = 643px
+
+format: x1, y1, x2, y2 [px]
+
+end info
+
+start specs
+
+start walls
+
+318,0,643,407
+0,400,237,543
+0,573,255,643
+
+end walls
+
+end info
