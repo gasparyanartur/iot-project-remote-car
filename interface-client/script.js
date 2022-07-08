@@ -90,10 +90,6 @@ function initiate() {
         updateActiveMenu(ActiveMenu.Map);
     });
 
-    map.canvas.addEventListener('click', context => {
-        console.log("abc");
-    });
-
     updateCurrentState(State.Active);
     updateActiveMenu(ActiveMenu.Camera);
 }
@@ -122,9 +118,10 @@ function updateCurrentState(newState) {
     initiateState(newState);
 }
 
-function initateMenu(menu) {
+async function initateMenu(menu) {
     switch (menu) {
         case ActiveMenu.Map:
+            map = await createMap();
             map.render();
         default:
             break;

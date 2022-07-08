@@ -8,24 +8,53 @@
         "height": 1000,
         "width": 643
     },
-    "walls": [
+    "areas": [
         {
+            "name": "livingroom-wall",
             "x1": 318,
             "y1": 0,
             "x2": 643,
-            "y2": 407
+            "y2": 518,
+            "pathable": false
         },
         {
+            "name": "bathroom",
             "x1": 0,
             "y1": 400,
             "x2": 237,
-            "y2": 543
+            "y2": 543,
+            "pathable": false
         },
         {
+            "name": "master-bedroom",
             "x1": 0,
-            "y1": 537,
-            "x2": 255,
-            "y2": 643
+            "y1": 518,
+            "x2": 237,
+            "y2": 963,
+            "pathable": false
+        },
+        {
+            "name": "kitchen",
+            "x1": 235,
+            "y1": 617,
+            "x2": 455,
+            "y2": 952,
+            "pathable": false
+        },
+        {
+            "name": "small-bedroom",
+            "x1": 462,
+            "y1": 615,
+            "x2": 642,
+            "y2": 955,
+            "pathable": false
+        }
+    ],
+    "points": [
+        {
+            "name": "start-bedroom",
+            "x": 690,
+            "y": 314
         }
     ]
 }
