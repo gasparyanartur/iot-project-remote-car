@@ -5,6 +5,7 @@ const createMap = async () => {
     };
 
     const areas = [];
+    const points = [];
 
     const readSpecs = async (houseStats) => {
         const file = await fetch('/roomspecs.json');
@@ -18,6 +19,7 @@ const createMap = async () => {
         houseStats.height = pixelToMeter(data.house.height);
 
         areas.splice(0, areas.length);
+        points.splice(0, points.length);
 
         data.areas.forEach(area => {
             const x = pixelToMeter(area.x1);
@@ -25,6 +27,12 @@ const createMap = async () => {
             const w = pixelToMeter(area.x2 - area.x1);
             const h = pixelToMeter(area.y2 - area.y1);
             areas.push({ x, y, w, h });
+        });
+
+        data.points.forEach(pt => {
+            const x = pixelToMeter(pt.x);
+            const y = pixelToMeter(pt.y);
+            points.push({ x, y });
         });
     };
 
@@ -50,9 +58,17 @@ const createMap = async () => {
             ctx.fillStyle = 'blue';
             ctx.fillRect(meterToBrowserSize(w.x), meterToBrowserSize(w.y), meterToBrowserSize(w.w), meterToBrowserSize(w.h));
         });
+
+        points.forEach(p => {
+            ctx.fillStyle = 'red';
+            ctx.moveTo(meterToBrowserSize(p.x), meterToBrowserSize(p.y));
+            console.log(meterToBrowserSize(p.x), meterToBrowserSize(p.y));
+            ctx.arc(meterToBrowserSize(p.x), meterToBrowserSize(p.y), 15, 0, 2 * Math.PI, true);
+            ctx.fill();
+        });
     };
 
-    ctx.stroke();
+    ctx.fill();
 
     return { canvas, render };
 };
