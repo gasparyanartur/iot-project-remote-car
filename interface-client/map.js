@@ -8,8 +8,15 @@ const createMap = async () => {
     const points = [];
 
     const readSpecs = async (houseStats) => {
-        const file = await fetch('/roomspecs.json');
+        const file = await fetch('roomspecs.json');
+
+        if (file.status == 404) {
+            console.log("Failed to read file");
+            return;
+        }
         const data = await file.json();
+
+        console.log(data);
 
         const pixelToMeter = (pix) => {
             return pix * data.general.scale / (data.general.zoom * data.general.pix_to_cm * 100);
