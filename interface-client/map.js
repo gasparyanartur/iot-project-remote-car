@@ -41,26 +41,27 @@ const createMap = async () => {
 
     const meterToBrowserSize = (meter) => 50 * meter;
 
-    const canvasWidth = meterToBrowserSize(specs.house.width);
-    const canvasHeight = meterToBrowserSize(specs.house.height);
+    const canv_m = dictApply(specs.house, ['width', 'height'], meterToBrowserSize);
 
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = canv_m.width;
+    canvas.height = canv_m.height;
 
     const render = () => {
         ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        ctx.fillRect(0, 0, canv_m.width, canv_m.height);
 
         specs.areas.forEach(w => {
             ctx.fillStyle = 'blue';
-            ctx.fillRect(meterToBrowserSize(w.x), meterToBrowserSize(w.y), meterToBrowserSize(w.w), meterToBrowserSize(w.h));
+            const wm = dictApply(w, ['x', 'y', 'w', 'h'], meterToBrowserSize);
+            ctx.fillRect(wm.x, wm.y, wm.w, wm.h);
         });
 
         specs.points.forEach(p => {
             ctx.fillStyle = 'red';
-            ctx.moveTo(meterToBrowserSize(p.x), meterToBrowserSize(p.y));
-            console.log(meterToBrowserSize(p.x), meterToBrowserSize(p.y));
-            ctx.arc(meterToBrowserSize(p.x), meterToBrowserSize(p.y), 15, 0, 2 * Math.PI, true);
+            const pm = dictApply(p, ['x', 'y'], meterToBrowserSize);
+            ctx.moveTo(pm.x, pm.y);
+            console.log(pm.x, pm.y);
+            ctx.arc(pm.x, pm.y, 15, 0, 2 * Math.PI, true);
             ctx.fill();
         });
     };
