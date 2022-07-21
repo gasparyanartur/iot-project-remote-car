@@ -11,7 +11,7 @@ namespace MotorController
         {
         }
 
-        inline void init()
+        void setup()
         {
             pinMode(this->PIN_IN1, OUTPUT);
             pinMode(this->PIN_IN2, OUTPUT);

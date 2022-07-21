@@ -4,17 +4,26 @@
 #include "sensor_controller.h"
 #include "motor_controller.h"
 
+//#define _SCAN_I2C
+//#include "i2c_scanner.h"
+
+
 
 void setup() 
 {
+  #ifdef _SCAN_I2C
+  ScannerI2C::setup();
+  ScannerI2C::scan();
+  #endif //_SCAN_I2C
+
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println("\nStarting setup...\n");
 
   startSensorController(); 
 
-  MotorController::motorLeft.init();
-  MotorController::motorRight.init();
+  MotorController::motorLeft.setup();
+  MotorController::motorRight.setup();
   Serial.println("LeftForward");
   MotorController::motorLeft.rotateForward();
   delay(2000);
@@ -44,5 +53,6 @@ void setup()
 
 void loop() {
   updateWebClient();
+  SensorController::AttitudeController::tick();
 };
 
