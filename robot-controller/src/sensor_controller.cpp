@@ -63,7 +63,7 @@ namespace SensorController
     {
         const uint8_t I2C_ADDRESS{0x68};
         const uint8_t FIFO_SIZE{64};
-        const uint32_t CLOCK_FREQ{20000};
+        const uint32_t CLOCK_FREQ{100000};
 
         namespace Status
         {
@@ -105,22 +105,22 @@ namespace SensorController
 
             inline void displayVector(const String &label, const float array[3])
             {
-                Serial.printf("%s: (%f, %f, %f)", label.c_str(), array[0], array[1], array[2]);
+                Serial.printf("%s: (%f, %f, %f)\n", label.c_str(), array[0], array[1], array[2]);
             }
 
             inline void displayVector(const String &label, const VectorFloat vector)
             {
-                Serial.printf("%s: (%f, %f, %f)", label.c_str(), vector.x, vector.y, vector.z);
+                Serial.printf("%s: (%f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z);
             }
 
             inline void displayVector(const String &label, const VectorInt16 vector)
             {
-                Serial.printf("%s: (%hd, %hd, %hd)", label.c_str(), vector.x, vector.y, vector.z);
+                Serial.printf("%s: (%hd, %hd, %hd)\n", label.c_str(), vector.x, vector.y, vector.z);
             }
 
             inline void displayVector(const String &label, const Quaternion vector)
             {
-                Serial.printf("%s: (%f, %f, %f, %f)", label.c_str(), vector.x, vector.y, vector.z, vector.w);
+                Serial.printf("%s: (%f, %f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z, vector.w);
             }
         }
 
