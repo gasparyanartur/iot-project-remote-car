@@ -16,6 +16,7 @@ namespace MessageHeader
     namespace DataType
     {
         const byte Image = 1;
+        const byte Measurement = 2;
     }
 
     namespace RequestType
@@ -27,6 +28,24 @@ namespace MessageHeader
     {
         const byte OK = 1;
         const byte FAIL = 2;
+    }
+
+    namespace MeasurementType {
+        const byte Rotation = 1;
+        const byte Acceleration = 2;
+        const byte Gravity = 3;
+    }
+
+    namespace RotationUnit {
+        const byte Quaternions = 1;
+        const byte Radians = 2;
+        const byte Degrees = 3;
+    }
+
+    namespace AccelerationType {
+        const byte Raw = 1;
+        const byte Relative = 2;
+        const byte World = 3;
     }
 
 }

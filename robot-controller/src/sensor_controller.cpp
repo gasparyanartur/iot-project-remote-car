@@ -2,6 +2,7 @@
 #include "esp_camera.h"
 #include "camera_pins.h"
 #include "sensor_controller.h"
+#include "message_types.h"
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 
@@ -53,7 +54,6 @@ void startSensorController()
     Serial.println("Sensor controller initiated");
     */
 
-
     SensorController::AttitudeController::setup();
 }
 
@@ -87,11 +87,24 @@ namespace SensorController
         namespace Measurement
         {
             float rotEulerRadMeasure[3];
+            float rotEulerDegMeasure[3];
             Quaternion rotQuatMeasure;
             VectorInt16 accelMeasure;
             VectorInt16 realAccelMeasure;
             VectorInt16 worldAccelMeasure;
             VectorFloat gravityVec;
+
+            inline float radToDeg(const float rad)
+            {
+                return rad * 180 / PI;
+            }
+
+            inline void radToDeg(const float rads[3], float degs[3])
+            {
+                degs[0] = radToDeg(rads[0]);
+                degs[1] = radToDeg(rads[1]);
+                degs[2] = radToDeg(rads[2]);
+            }
 
             void updateMeasurements()
             {
@@ -101,6 +114,7 @@ namespace SensorController
                 mpuDevice.dmpGetGravity(&gravityVec, &rotQuatMeasure);
                 mpuDevice.dmpGetLinearAccel(&realAccelMeasure, &accelMeasure, &gravityVec);
                 mpuDevice.dmpGetLinearAccelInWorld(&worldAccelMeasure, &realAccelMeasure, &rotQuatMeasure);
+                radToDeg(rotEulerRadMeasure, rotEulerDegMeasure);
             }
 
             inline void displayVector(const String &label, const float array[3])
@@ -122,6 +136,13 @@ namespace SensorController
             {
                 Serial.printf("%s: (%f, %f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z, vector.w);
             }
+
+            void getRotationDegrees(float deg[3]) {
+                deg[0] = rotEulerDegMeasure[0];
+                deg[1] = rotEulerDegMeasure[1];
+                deg[2] = rotEulerDegMeasure[2];
+            }
+
         }
 
         void ICACHE_RAM_ATTR dmpDataReady()
@@ -133,7 +154,7 @@ namespace SensorController
         {
             Serial.println("Initializing attitude sensor...");
 
-            //Wire.begin(0x68u, Pins::SDA, Pins::SCL);
+            // Wire.begin(0x68u, Pins::SDA, Pins::SCL);
             Wire.begin();
             Wire.setClock(CLOCK_FREQ);
 
