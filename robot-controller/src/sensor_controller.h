@@ -22,7 +22,8 @@ namespace SensorController
                 VectorFloat Gravity;
             };
 
-            DataType* getMeasurement(byte msgType, byte msgSpecifier);
+            void getRotationDegrees(float deg[3]);
+            void getRotationDegrees(char *deg);
         }
 
     }

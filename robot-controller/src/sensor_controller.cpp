@@ -137,10 +137,16 @@ namespace SensorController
                 Serial.printf("%s: (%f, %f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z, vector.w);
             }
 
-            void getRotationDegrees(float deg[3]) {
+            void getRotationDegrees(float deg[3])
+            {
                 deg[0] = rotEulerDegMeasure[0];
                 deg[1] = rotEulerDegMeasure[1];
                 deg[2] = rotEulerDegMeasure[2];
+            }
+
+            void getRotationDegrees(char *deg)
+            {
+                std::copy(rotEulerDegMeasure, rotEulerDegMeasure + 12, deg);
             }
 
         }

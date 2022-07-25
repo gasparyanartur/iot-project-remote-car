@@ -8,7 +8,7 @@
 #include "esp_camera.h"
 #include "message_types.h"
 
-
+#include "sensor_controller.h"
 
 void onMessageCallback(websockets::WebsocketsMessage message);
 void onEventCallback(websockets::WebsocketsEvent event, String data);
@@ -20,6 +20,8 @@ inline void handleBinaryRequest(const byte data[], const size_t length);
 inline void handleUnknownBinaryMessage(const byte data[], const size_t length);
 inline void handleBinaryDataRequest(const byte data[], const size_t length);
 inline void handleBinaryDataImageRequest(const byte data[], const size_t length);
+inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t length);
+inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const size_t length);
 inline void handleUnknownBinaryRequest(const byte data[], const size_t length);
 inline void handleUnknownBinaryDataRequest(const byte data[], const size_t length);
 
@@ -81,7 +83,6 @@ void onMessageCallback(websockets::WebsocketsMessage message)
 
    else if (message.isText())
       onTextMessageCallback(message.data());
-
 }
 
 void onEventCallback(websockets::WebsocketsEvent event, String data)
@@ -130,18 +131,11 @@ inline void onBinaryMessageCallback(const byte data[], const size_t length)
    switch (messageType)
    {
    case MessageHeader::MessageType::Request:
+      handleBinaryRequest(data + 1, length - 1);
       break;
 
    default:
       handleUnknownBinaryMessage(data, length);
-   }
-   if (data[0] == MessageHeader::MessageType::Request)
-   {
-      handleBinaryRequest(data + 1, length - 1);
-   }
-   else
-   {
-      Serial.printf("Unrecognized request: %d\n", data[0]);
    }
 }
 
@@ -171,6 +165,9 @@ inline void handleBinaryDataRequest(const byte data[], const size_t length)
       handleBinaryDataImageRequest(data + 1, length - 1);
       break;
 
+   case MessageHeader::DataType::Measurement:
+      handleBinaryDataMeasurementRequest(data + 1, length - 1);
+
    default:
       handleUnknownBinaryDataRequest(data, length);
       break;
@@ -191,17 +188,67 @@ inline void handleBinaryDataImageRequest(const byte data[], const size_t length)
 
    Serial.println("Packing frame...");
 
-   char* c = new char[fb->len+2];
+   char *c = new char[fb->len + 2];
 
    c[0] = MessageHeader::MessageType::Data;
    c[1] = MessageHeader::DataType::Image;
 
    std::copy(fb->buf, fb->buf + fb->len, c + 2);
-   client.sendBinary(c, fb->len+2);
+   client.sendBinary(c, fb->len + 2);
 
-   delete [] c;
-   
+   delete[] c;
+
    esp_camera_fb_return(fb);
+}
+
+inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t length)
+{
+   const byte measurementType = data[0];
+   switch (measurementType)
+   {
+   case MessageHeader::MeasurementType::Rotation:
+      // TODO
+      handleBinaryDataMeasurementRotationRequest(data + 1, length - 1);
+      break;
+
+   case MessageHeader::MeasurementType::Acceleration:
+      // DATA, MEASUREMENT, ROTATION, DEGREES, X0, X1, X2, X3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3
+
+      char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
+                 MessageHeader::MeasurementType::Rotation, MessageHeader::RotationUnit::Degrees};
+
+      SensorController::AttitudeController::Measurement::getRotationDegrees(c + 4);
+      client.sendBinary(c, 16);
+      break;
+
+   case MessageHeader::MeasurementType::Gravity:
+      // TODO
+      break;
+
+   default:
+      // TODO
+      break;
+   }
+}
+
+inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const size_t length)
+{
+   const byte rotationUnit = data[0];
+   switch (rotationUnit)
+   {
+   case MessageHeader::RotationUnit::Degrees:
+      /* code */
+      break;
+
+   case MessageHeader::RotationUnit::Quaternions:
+      break;
+
+   case MessageHeader::RotationUnit::Radians:
+      break;
+
+   default:
+      break;
+   }
 }
 
 inline void handleUnknownBinaryMessage(const byte data[], const size_t length)
