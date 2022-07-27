@@ -17,6 +17,31 @@ class DataTypes:
     __slots__ = tuple()
 
     image: int = 1
+    measurement: int = 2
+
+
+class MeasurementType:
+    __slots__ = tuple()
+
+    rotation: int = 1
+    acceleration: int = 2
+    gravity: int = 3
+
+
+class RotationUnit:
+    __slots__ = tuple()
+
+    quaternions: int = 1
+    radians: int = 2
+    degrees: int = 3
+
+
+class AccelerationType:
+    __slots__ = tuple()
+
+    raw: int = 1
+    relative: int = 2
+    world: int = 3
 
 
 class StatusTypes:
