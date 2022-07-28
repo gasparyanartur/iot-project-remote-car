@@ -5,7 +5,7 @@ import websockets
 import asyncio
 
 from message_types import DataTypes, MessageTypes, RequestTypes
-from src.message_types import MeasurementType, RotationUnit
+from message_types import MeasurementType, RotationUnit
 
 MessageType = str | bytes
 SocketType = websockets.WebSocketServerProtocol
@@ -133,6 +133,10 @@ class Connection:
         except asyncio.TimeoutError:
             return None
 
+        except RuntimeError:
+            return None
+
+
     async def _handle_message(self, message: MessageType) -> None:
         for cb in self.callbacks:
             if cb.test(self, message):
@@ -238,7 +242,8 @@ def connection_factory():
                         m[4] == RotationUnit.degrees
                     ),
                     lambda c, m: (
-                        conns[ClientNames.robot].buffer(m)
+                        conns[ClientNames.robot].buffer(m),
+                        print("Sending...")
                     )
                 )
             ],

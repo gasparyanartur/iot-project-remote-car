@@ -13,15 +13,6 @@ namespace SensorController
 
         namespace Measurement
         {
-
-            union DataType
-            {
-                float EulerAngle[3];
-                Quaternion Quaternion;
-                VectorInt16 Acceleration;
-                VectorFloat Gravity;
-            };
-
             void getRotationDegrees(float deg[3]);
             void getRotationDegrees(char *deg);
         }

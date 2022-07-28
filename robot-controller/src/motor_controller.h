@@ -4,6 +4,7 @@
 
 namespace MotorController
 {
+
     class MotorDC
     {
     public:
@@ -42,4 +43,27 @@ namespace MotorController
         }
     } motorLeft{26, 27}, motorRight{19, 18};
 
+    void performMotorDemo()
+    {
+        Serial.println("LeftForward");
+        motorLeft.rotateForward();
+        delay(2000);
+        motorLeft.rotateStop();
+        delay(2000);
+        Serial.println("LeftBack");
+        motorLeft.rotateBackward();
+        delay(2000);
+        Serial.println("RightForward");
+        motorLeft.rotateStop();
+        delay(2000);
+        motorRight.rotateForward();
+        delay(2000);
+        motorRight.rotateStop();
+        delay(2000);
+        Serial.println("RightBack");
+        motorRight.rotateBackward();
+        delay(2000);
+        motorRight.rotateStop();
+        delay(2000);
+    }
 }

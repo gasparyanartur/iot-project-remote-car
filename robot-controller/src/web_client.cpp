@@ -212,6 +212,8 @@ inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t l
       break;
 
    case MessageHeader::MeasurementType::Acceleration:
+   {
+
       // DATA, MEASUREMENT, ROTATION, DEGREES, X0, X1, X2, X3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3
 
       char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
@@ -220,6 +222,7 @@ inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t l
       SensorController::AttitudeController::Measurement::getRotationDegrees(c + 4);
       client.sendBinary(c, 16);
       break;
+   }
 
    case MessageHeader::MeasurementType::Gravity:
       // TODO

@@ -99,8 +99,10 @@ function initiate() {
     });
 
     rotationDegreesButton.addEventListener('click', context => {
-        const request = new Uint8Array([0, 1, 1]);
+        const request = new Uint8Array([0, 1, 2, 1, 3]);
         serverSocket.send(request);
+        console.log("sent request: " + request);
+
         globalThis.clientStatus = ClientStatus.WaitingForMeasurements;
     });
 
