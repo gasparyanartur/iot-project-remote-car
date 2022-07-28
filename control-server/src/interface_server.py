@@ -5,6 +5,7 @@ import websockets
 import asyncio
 
 from message_types import DataTypes, MessageTypes, RequestTypes
+from src.message_types import MeasurementType, RotationUnit
 
 MessageType = str | bytes
 SocketType = websockets.WebSocketServerProtocol
@@ -180,6 +181,19 @@ def connection_factory():
                     lambda c, m: isinstance(m, str),
                     lambda c, m: print_incoming_message(c, m)
                 ),
+                Callback(
+                    lambda c, m: (
+                        isinstance(m, bytes) and
+                        len(m) >= 4 and
+                        m[0] == MessageTypes.data and
+                        m[1] == DataTypes.measurement and
+                        m[2] == MeasurementType.rotation and
+                        m[3] == RotationUnit.degrees
+                    ),
+                    lambda c, m: (
+                        conns[ClientNames.interface].buffer(m)
+                    )
+                )
             ],
         )
 
@@ -203,7 +217,7 @@ def connection_factory():
                     lambda c, m: (
                         not state['waiting_for_img'] and
                         isinstance(m, bytes) and
-                        len(m) >= 2 and
+                        len(m) == 3 and
                         m[0] == MessageTypes.request and
                         m[1] == RequestTypes.data and
                         m[2] == DataTypes.image
@@ -213,6 +227,20 @@ def connection_factory():
                         conns[ClientNames.robot].buffer(m)
                     )
                 ),
+                Callback(
+                    lambda c, m: (
+                        isinstance(m, bytes) and
+                        len(m) == 5 and
+                        m[0] == MessageTypes.request and
+                        m[1] == RequestTypes.data and
+                        m[2] == DataTypes.measurement and
+                        m[3] == MeasurementType.rotation and
+                        m[4] == RotationUnit.degrees
+                    ),
+                    lambda c, m: (
+                        conns[ClientNames.robot].buffer(m)
+                    )
+                )
             ],
         )
 
