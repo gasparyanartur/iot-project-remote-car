@@ -26,6 +26,8 @@ const helloButton = document.getElementById("hello-button");
 const uriConnectButton = document.getElementById("uri-connect-button");
 const cameraDispay = document.getElementById("camera-display");
 const uriInputField = document.getElementById("uri-input");
+const rotationDegreesText = document.getElementById("rotation-degrees-text");
+const rotationDegreesButton = document.getElementById("rotation-degrees-button");
 
 const stateCheatList = document.getElementById("menu-state-cheatlist");
 const captureButton = document.getElementById("capture-button");
@@ -94,6 +96,12 @@ function initiate() {
 
     measurementsButton.addEventListener('click', context => {
         updateActiveMenu(ActiveMenu.Measurements);
+    });
+
+    rotationDegreesButton.addEventListener('click', context => {
+        const request = new Uint8Array([0, 1, 1]);
+        serverSocket.send(request);
+        globalThis.clientStatus = ClientStatus.WaitingForMeasurements;
     });
 
     updateCurrentState(State.Active);
@@ -187,6 +195,10 @@ function handleMessage(message) {
             handleWaitingForCameraFrame(message.data);
             break;
 
+        case ClientStatus.WaitingForMeasurements:
+            handleWaitingForMeasurements(message.data);
+            break;
+
         default:
             console.log("Received message while in invalid status {clientStatus}. Resetting to Idle");
             clientStatus = ClientStatus.Idle;
@@ -232,6 +244,10 @@ async function handleWaitingForCameraFrame(message) {
         cameraImage.width = width;
     }
 
+}
+
+function handleWaitingForMeasurements(message) {
+    console.log("message: " + message);
 }
 
 
