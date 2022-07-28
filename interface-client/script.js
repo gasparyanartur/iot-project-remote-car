@@ -6,6 +6,7 @@ const State = {
 const ActiveMenu = {
     Camera: "camera-menu",
     Map: "map-menu",
+    Measurements: "measurements-menu"
 }
 
 const ClientStatus = {
@@ -20,6 +21,7 @@ const HiddenClass = "hidden";
 const connectButton = document.getElementById("connect-button");
 const camButton = document.getElementById("cam-button");
 const mapButton = document.getElementById("map-button");
+const measurementsButton = document.getElementById("measurements-button");
 const helloButton = document.getElementById("hello-button");
 const uriConnectButton = document.getElementById("uri-connect-button");
 const cameraDispay = document.getElementById("camera-display");
@@ -88,6 +90,10 @@ function initiate() {
 
     mapButton.addEventListener('click', context => {
         updateActiveMenu(ActiveMenu.Map);
+    });
+
+    measurementsButton.addEventListener('click', context => {
+        updateActiveMenu(ActiveMenu.Measurements);
     });
 
     updateCurrentState(State.Active);
