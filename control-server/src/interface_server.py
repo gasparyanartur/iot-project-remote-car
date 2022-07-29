@@ -136,7 +136,6 @@ class Connection:
         except RuntimeError:
             return None
 
-
     async def _handle_message(self, message: MessageType) -> None:
         for cb in self.callbacks:
             if cb.test(self, message):
@@ -182,7 +181,7 @@ def connection_factory():
                     )
                 ),
                 Callback(
-                    lambda c, m: isinstance(m, str),
+                    lambda c, m: True,
                     lambda c, m: print_incoming_message(c, m)
                 ),
                 Callback(
@@ -214,8 +213,18 @@ def connection_factory():
             state,
             [
                 Callback(
-                    lambda c, m: isinstance(m, str),
+                    lambda c, m: True,
                     lambda c, m: print_incoming_message(c, m)
+                ),
+                Callback(
+                    lambda c, m: (
+                        isinstance(m, str) and
+                        m == "hello"
+                    ),
+                    lambda c, m:  (
+                        conns[ClientNames.robot].buffer("hello"),
+                        print("Sending hello to robot")
+                    )
                 ),
                 Callback(
                     lambda c, m: (

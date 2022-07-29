@@ -137,16 +137,16 @@ namespace SensorController
                 Serial.printf("%s: (%f, %f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z, vector.w);
             }
 
-            void getRotationDegrees(float deg[3])
+            void getRotationDegrees(float* deg)
             {
                 deg[0] = rotEulerDegMeasure[0];
                 deg[1] = rotEulerDegMeasure[1];
                 deg[2] = rotEulerDegMeasure[2];
             }
 
-            void getRotationDegrees(char *deg)
+            void getRotationDegrees(char* deg)
             {
-                std::copy(rotEulerDegMeasure, rotEulerDegMeasure + 12, deg);
+                memcpy(deg, rotEulerDegMeasure, 12);
             }
 
         }
@@ -211,7 +211,6 @@ namespace SensorController
             if ((Status::intStatus & 0x10) || (Status::fifoCount == 1 << 10))
             {
                 mpuDevice.resetFIFO();
-                Serial.println("FIFO Overflow");
                 return;
             }
 
@@ -225,7 +224,7 @@ namespace SensorController
             Status::fifoCount -= Status::packetSize;
 
             Measurement::updateMeasurements();
-            Measurement::displayVector("radmeasurement", Measurement::rotEulerRadMeasure);
+            //Measurement::displayVector("radmeasurement", Measurement::rotEulerRadMeasure);
         }
 
     }

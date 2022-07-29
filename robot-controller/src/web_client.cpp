@@ -42,8 +42,26 @@ void startWebClient()
    client.onMessage(onMessageCallback);
 
    Serial.printf("Connecting to socket at URI: %s\n", SOCKET_URI);
-   client.connect(SOCKET_URI);
-   Serial.println("Connected to socket");
+   for (int i = 0; i < 5; ++i)
+   {
+      if (client.connect("192.168.1.104", 8002, "/"))
+      {
+         Serial.println("Successfully connected to socket.");
+         goto CONNECTED_TO_SOCKET;
+      }
+
+      Serial.print("Failed to connect to socket. Trying again.");
+      for (int j = 0; j < i; ++i)
+         Serial.print(".");
+      Serial.println();
+
+      delay(500);
+   }
+   Serial.println("Failed to connect to socket.");
+   return;
+
+CONNECTED_TO_SOCKET:
+   client.ping();
 
    Serial.println("Web client initiated");
 }
@@ -83,6 +101,15 @@ void onMessageCallback(websockets::WebsocketsMessage message)
 
    else if (message.isText())
       onTextMessageCallback(message.data());
+
+   else
+   {
+
+      Serial.print("Received unknown message: ");
+      for (const auto m : message.data())
+         Serial.print(m);
+      Serial.println();
+   }
 }
 
 void onEventCallback(websockets::WebsocketsEvent event, String data)
@@ -117,16 +144,22 @@ bool connectToWifi()
    return false;
 
 WIFI_CONNECTED:
-   Serial.printf("\nSuccessfully connected to address: %s\n", WiFi.localIP().toString());
+   Serial.printf("\nSuccessfully connected to WIFI on address: %s\n", WiFi.localIP().toString());
    return true;
 }
 
 inline void onTextMessageCallback(const String msg)
 {
+   Serial.printf("Received text message: %s\n", msg);
 }
 
 inline void onBinaryMessageCallback(const byte data[], const size_t length)
 {
+   Serial.print("Received binary message: ");
+   for (int i = 0; i < length; ++i)
+      Serial.print(data[i]);
+   Serial.println();
+
    const byte messageType = data[0];
    switch (messageType)
    {
@@ -136,6 +169,7 @@ inline void onBinaryMessageCallback(const byte data[], const size_t length)
 
    default:
       handleUnknownBinaryMessage(data, length);
+      break;
    }
 }
 
@@ -167,6 +201,7 @@ inline void handleBinaryDataRequest(const byte data[], const size_t length)
 
    case MessageHeader::DataType::Measurement:
       handleBinaryDataMeasurementRequest(data + 1, length - 1);
+      break;
 
    default:
       handleUnknownBinaryDataRequest(data, length);
@@ -213,14 +248,7 @@ inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t l
 
    case MessageHeader::MeasurementType::Acceleration:
    {
-
-      // DATA, MEASUREMENT, ROTATION, DEGREES, X0, X1, X2, X3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3
-
-      char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
-                 MessageHeader::MeasurementType::Rotation, MessageHeader::RotationUnit::Degrees};
-
-      SensorController::AttitudeController::Measurement::getRotationDegrees(c + 4);
-      client.sendBinary(c, 16);
+      // TODO
       break;
    }
 
@@ -240,8 +268,23 @@ inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const 
    switch (rotationUnit)
    {
    case MessageHeader::RotationUnit::Degrees:
-      /* code */
+   {
+      // DATA, MEASUREMENT, ROTATION, DEGREES, X0, X1, X2, X3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3
+      char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
+                 MessageHeader::MeasurementType::Rotation, MessageHeader::RotationUnit::Degrees};
+
+      //float s[3];
+      //SensorController::AttitudeController::Measurement::getRotationDegrees(s);
+
+      //mov   
+      Serial.println("Fixing...");
+      SensorController::AttitudeController::Measurement::getRotationDegrees(c+4);
+      Serial.println("Fixed");
+      //std::move(s, s+12, c+4);
+      client.sendBinary(c, 16);
+      Serial.println("Sent");
       break;
+   }
 
    case MessageHeader::RotationUnit::Quaternions:
       break;

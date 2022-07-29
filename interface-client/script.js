@@ -249,7 +249,10 @@ async function handleWaitingForCameraFrame(message) {
 }
 
 function handleWaitingForMeasurements(message) {
-    console.log("message: " + message);
+    const header = new Int8Array(message, 0, 4);
+    const data = new Int8Array(message, 4);
+    console.log("header: " + header + " data: " + data);
+    clientStatus = ClientStatus.Idle;
 }
 
 
