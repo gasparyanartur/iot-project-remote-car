@@ -72,7 +72,7 @@ void updateWebClient()
    {
       client.poll();
 
-      auto serialInput = Serial.readString();
+      const auto serialInput = Serial.readString();
       if (!serialInput.isEmpty())
       {
          Serial.printf("Sending following message: %s\n", serialInput.c_str());

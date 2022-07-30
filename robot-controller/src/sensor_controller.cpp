@@ -71,6 +71,7 @@ namespace SensorController
             uint8_t intStatus, devStatus;
             uint16_t packetSize, fifoCount;
             uint8_t fifoBuffer[FIFO_SIZE];
+            uint8_t packetLoopCount = 0;
 
             volatile bool isInterruptDown{false};
         }
@@ -137,14 +138,14 @@ namespace SensorController
                 Serial.printf("%s: (%f, %f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z, vector.w);
             }
 
-            void getRotationDegrees(float* deg)
+            void getRotationDegrees(float *deg)
             {
                 deg[0] = rotEulerDegMeasure[0];
                 deg[1] = rotEulerDegMeasure[1];
                 deg[2] = rotEulerDegMeasure[2];
             }
 
-            void getRotationDegrees(char* deg)
+            void getRotationDegrees(char *deg)
             {
                 memcpy(deg, rotEulerDegMeasure, 12);
             }
@@ -154,6 +155,37 @@ namespace SensorController
         void ICACHE_RAM_ATTR dmpDataReady()
         {
             Status::isInterruptDown = true;
+        }
+
+
+        inline uint8_t GetCurrentFIFOPacket(uint8_t *data, uint16_t max_loops)
+        {
+            /*
+             * Author: paynterf
+             * Source: https://www.fpaynter.com/2019/10/mpu6050-fifo-buffer-management-study/
+             * Date: 2021-Nov-1
+             */
+            // This is needed because of some issues with the way Jeff Rowberg's I2CDev manages the FIFO buffer for the MPU6050
+
+            mpuDevice.resetFIFO();
+            delay(1);
+
+            Status::fifoCount = mpuDevice.getFIFOCount();
+            Status::packetLoopCount = 0;
+
+            while (Status::fifoCount < Status::packetSize && Status::packetLoopCount < max_loops)
+            {
+                Status::packetLoopCount++;
+                Status::fifoCount = mpuDevice.getFIFOCount();
+                delay(2);
+            }
+
+            if (Status::packetLoopCount >= max_loops)
+                return 0;
+
+            // if we get to here, there should be exactly one packet in the FIFO
+            mpuDevice.getFIFOBytes(data, Status::packetSize);
+            return 1;
         }
 
         void setup()
@@ -201,6 +233,7 @@ namespace SensorController
 
         void tick()
         {
+            /*
             if ((!Status::isDmpReady) || (!Status::isInterruptDown && Status::fifoCount << Status::packetSize))
                 return;
 
@@ -211,6 +244,7 @@ namespace SensorController
             if ((Status::intStatus & 0x10) || (Status::fifoCount == 1 << 10))
             {
                 mpuDevice.resetFIFO();
+                Status::fifoCount = mpuDevice.getFIFOCount();
                 return;
             }
 
@@ -222,9 +256,11 @@ namespace SensorController
 
             mpuDevice.getFIFOBytes(Status::fifoBuffer, Status::packetSize);
             Status::fifoCount -= Status::packetSize;
-
-            Measurement::updateMeasurements();
-            //Measurement::displayVector("radmeasurement", Measurement::rotEulerRadMeasure);
+            */  
+            auto status = GetCurrentFIFOPacket(Status::fifoBuffer, 3);
+            if (status)
+                Measurement::updateMeasurements();
+            // Measurement::displayVector("radmeasurement", Measurement::rotEulerRadMeasure);
         }
 
     }
