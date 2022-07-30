@@ -277,12 +277,18 @@ inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const 
       //SensorController::AttitudeController::Measurement::getRotationDegrees(s);
 
       //mov   
-      Serial.println("Fixing...");
       SensorController::AttitudeController::Measurement::getRotationDegrees(c+4);
-      Serial.println("Fixed");
       //std::move(s, s+12, c+4);
+
+      Serial.print("Sending: ");
+      for(int i = 0; i < 16; ++i) {
+
+         Serial.print((int)c[i]);
+         Serial.print(' ');
+      }
+      Serial.println();
+      
       client.sendBinary(c, 16);
-      Serial.println("Sent");
       break;
    }
 

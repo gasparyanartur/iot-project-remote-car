@@ -293,8 +293,8 @@ function parseByteVector(byteArray, startIndex, nFloats, dtype) {
 }
 
 function handleWaitingForMeasurements(message) {
-    const header = new Int8Array(message, 0, 4);
-    const payload = new Int8Array(message, 4);
+    const header = new Uint8Array(message, 0, 4);
+    const payload = new Uint8Array(message, 4);
     console.log("header: " + header + " data: " + payload);
     const floatVector = parseByteVector(payload, 0, 3, "float32");
     console.log("measurements", floatVector);

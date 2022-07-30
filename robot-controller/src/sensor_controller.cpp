@@ -148,6 +148,7 @@ namespace SensorController
             void getRotationDegrees(char *deg)
             {
                 memcpy(deg, rotEulerDegMeasure, 12);
+                Measurement::displayVector("deg measurement", Measurement::rotEulerDegMeasure);
             }
 
         }
@@ -233,30 +234,6 @@ namespace SensorController
 
         void tick()
         {
-            /*
-            if ((!Status::isDmpReady) || (!Status::isInterruptDown && Status::fifoCount << Status::packetSize))
-                return;
-
-            Status::isInterruptDown = false;
-            Status::intStatus = mpuDevice.getIntStatus();
-            Status::fifoCount = mpuDevice.getFIFOCount();
-
-            if ((Status::intStatus & 0x10) || (Status::fifoCount == 1 << 10))
-            {
-                mpuDevice.resetFIFO();
-                Status::fifoCount = mpuDevice.getFIFOCount();
-                return;
-            }
-
-            if (!(Status::intStatus & 0x02))
-                return;
-
-            while (Status::fifoCount < Status::packetSize)
-                Status::fifoCount = mpuDevice.getFIFOCount();
-
-            mpuDevice.getFIFOBytes(Status::fifoBuffer, Status::packetSize);
-            Status::fifoCount -= Status::packetSize;
-            */  
             auto status = GetCurrentFIFOPacket(Status::fifoBuffer, 3);
             if (status)
                 Measurement::updateMeasurements();
