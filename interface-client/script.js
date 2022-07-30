@@ -248,10 +248,56 @@ async function handleWaitingForCameraFrame(message) {
 
 }
 
+function parseByteVector(byteArray, startIndex, nFloats, dtype) {
+    let funcGetter = null;
+    let size = null;
+
+    if (dtype === "float32") {
+        funcGetter = "getFloat32";
+        size = 4;
+    }
+    else if(dtype === "int32") {
+        funcGetter = "getInt32";
+        size = 4;
+    }
+    else if(dtype === "int16") {
+        funcGetter = "getInt16";
+        size = 2;
+    }
+    else if (dtype === "int8") {
+        funcGetter = "getInt8";
+        size = 1;
+    }
+    else {
+        console.error("Attemped to parse byte vector of unrecognized type " + dtype);
+        return [];
+    }
+
+    const endIndex = startIndex + 4 * nFloats;
+    if (endIndex > byteArray.length) {
+        console.error(
+            "Attempted to get " + nFloats +
+            " floats from array " + byteArray +
+            " starting at " + startIndex
+        );
+        return [];
+    }
+
+    const view = new DataView(byteArray.buffer);
+    const floatArray = [];
+    for (let i = startIndex; i < endIndex; i += size) {
+        floatArray.push(view[funcGetter](i));
+    }
+
+    return floatArray;
+}
+
 function handleWaitingForMeasurements(message) {
     const header = new Int8Array(message, 0, 4);
-    const data = new Int8Array(message, 4);
-    console.log("header: " + header + " data: " + data);
+    const payload = new Int8Array(message, 4);
+    console.log("header: " + header + " data: " + payload);
+    const floatVector = parseByteVector(payload, 0, 3, "float32");
+    console.log("measurements", floatVector);
     clientStatus = ClientStatus.Idle;
 }
 
