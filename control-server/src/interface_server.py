@@ -252,7 +252,6 @@ def connection_factory():
                     ),
                     lambda c, m: (
                         conns[ClientNames.robot].buffer(m),
-                        print("Sending...")
                     )
                 )
             ],
