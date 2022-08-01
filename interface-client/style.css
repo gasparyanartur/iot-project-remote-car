@@ -20,6 +20,18 @@ main {
     top: 5vh;
 }
 
+#menu {
+    display: flex;
+    flex-direction: row;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    padding-right: 2vw;
+    padding-top: 2vh;
+}
+
 #map {
     background-color:  slategray;
 }

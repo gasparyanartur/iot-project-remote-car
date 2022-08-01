@@ -29,6 +29,7 @@ const uriInputField = document.getElementById("uri-input");
 const rotationDegreesText = document.getElementById("rotation-degrees-text");
 const rotationDegreesButton = document.getElementById("rotation-degrees-button");
 
+const sideBar = document.getElementById("sidebar");
 const stateCheatList = document.getElementById("menu-state-cheatlist");
 const captureButton = document.getElementById("capture-button");
 
@@ -40,13 +41,6 @@ let clientStatus = ClientStatus.Idle;
 let currentImageURL = null;
 
 function initiate() {
-    Array.from(document.getElementsByClassName(ActivityStateClass)).forEach(element => {
-        if (element.classList.contains(currentState))
-            element.classList.remove(HiddenClass);
-        else
-            element.classList.add(HiddenClass);
-    });
-
     uriConnectButton.addEventListener("click", async (context) => {
         // TODO: Validate input
         const inputContent = uriInputField.value;
@@ -69,22 +63,9 @@ function initiate() {
         globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
     });
 
-    helloButton.addEventListener("click", (context) => {
-        serverSocket.send("hello");
-    });
-
     connectButton.addEventListener("click", (context) => {
 
     });
-
-    stateCheatList.childNodes.forEach(child => {
-        child.addEventListener('click', (context) => {
-            const stateName = context.target.textContent;
-            const state = State[stateName];
-            updateCurrentState(state);
-        });
-    });
-
 
     camButton.addEventListener('click', context => {
         updateActiveMenu(ActiveMenu.Camera);
@@ -104,6 +85,25 @@ function initiate() {
         console.log("sent request: " + request);
 
         globalThis.clientStatus = ClientStatus.WaitingForMeasurements;
+    });
+
+    //setupLayout();
+}
+
+function setupLayout() {
+    Array.from(document.getElementsByClassName(ActivityStateClass)).forEach(element => {
+        if (element.classList.contains(currentState))
+            element.classList.remove(HiddenClass);
+        else
+            element.classList.add(HiddenClass);
+    });
+
+    stateCheatList.childNodes.forEach(child => {
+        child.addEventListener('click', (context) => {
+            const stateName = context.target.textContent;
+            const state = State[stateName];
+            updateCurrentState(state);
+        });
     });
 
     updateCurrentState(State.Active);
