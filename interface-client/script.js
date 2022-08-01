@@ -112,8 +112,11 @@ function initiate() {
 
     goForwardButton.addEventListener('click', context => {
         const request = new Uint8Array([
-            
-        ]); // TODO
+            messageTypes.messageTypes.command,
+            messageTypes.commandType.move,
+            messageTypes.motorSelection.firstAndSecond,
+            messageTypes.moveDirection.forward
+        ]); 
         serverSocket.send(request);
         console.log("sent request: " + request);
     });

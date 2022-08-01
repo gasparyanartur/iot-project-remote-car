@@ -5,37 +5,43 @@
         "data": 2,
         "command": 3
     },
-
     "requestTypes": {
         "data": 1
     },
-
+    "commandTypes": {
+        "move": 1
+    },
+    "motorSelection": {
+        "first": 1,
+        "second": 2,
+        "firstAndSecond": 3
+    },
+    "moveDirection": {
+        "none": 0,
+        "forward": 1,
+        "backward": 2
+    },
     "dataTypes": {
         "image": 1,
         "measurement": 2
     },
-
     "statusTypes": {
         "ok": 1,
         "fail": 2
     },
-
     "measurementType": {
         "rotation": 1,
         "acceleration": 2,
         "gravity": 3
     },
-
     "rotationUnit": {
         "quaternions": 1,
         "radians": 2,
         "degrees": 3
     },
-
     "accelerationType": {
         "raw": 1,
         "relative": 2,
         "world": 3
     }
-
 }
