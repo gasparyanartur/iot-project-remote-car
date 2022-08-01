@@ -4,7 +4,7 @@ from typing import Callable
 import websockets
 import asyncio
 
-from .message_types import DataTypes, MessageTypes, RequestTypes
+from .message_types import CommandTypes, DataTypes, MessageTypes, MotorSelection, MoveDirection, RequestTypes
 from .message_types import MeasurementType, RotationUnit
 
 MessageType = str | bytes
@@ -252,6 +252,19 @@ def connection_factory():
                     ),
                     lambda c, m: (
                         conns[ClientNames.robot].buffer(m),
+                    )
+                ),
+                Callback(
+                    lambda c, m: (
+                        isinstance(m, bytes) and
+                        len(m) >= 4 and
+                        m[0] == MessageTypes.command and
+                        m[1] == CommandTypes.move and
+                        m[2] == MotorSelection.first_and_second and
+                        m[3] == MoveDirection.forward
+                    ),
+                    lambda c, m: (
+                        conns[ClientNames.robot].buffer(m)
                     )
                 )
             ],
