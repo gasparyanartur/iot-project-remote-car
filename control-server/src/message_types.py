@@ -13,6 +13,28 @@ class RequestTypes:
     data: int = 1
 
 
+class CommandTypes:
+    __slots__ = tuple()
+
+    move: int = 1
+
+
+class MotorSelection:
+    __slots__ = tuple()
+
+    first: int = 1
+    second: int = 2
+    first_and_second: int = 3
+
+
+class MoveDirection:
+    __slots__ = tuple()
+
+    none: int = 0
+    forward: int = 1
+    backward: int = 2
+
+
 class DataTypes:
     __slots__ = tuple()
 
