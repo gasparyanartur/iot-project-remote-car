@@ -66,7 +66,7 @@ function initiate() {
         serverSocket.binaryType = "arraybuffer";
         const success = await connectToServer(serverSocket, 2000);
         if (success) {
-            console.log(`Successfully connected to server at URL: {serverSocket.url}`);
+            console.log(`Successfully connected to server at URL: ${serverSocket.url}`);
             loadActiveMenu();
             serverSocket.onmessage = handleMessage;
         }
