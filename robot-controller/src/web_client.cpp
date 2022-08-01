@@ -9,6 +9,7 @@
 #include "message_types.h"
 
 #include "sensor_controller.h"
+#include "motor_controller.h"
 
 void onMessageCallback(websockets::WebsocketsMessage message);
 void onEventCallback(websockets::WebsocketsEvent event, String data);
@@ -17,11 +18,13 @@ void sendCameraCapture();
 inline void onTextMessageCallback(const String msg);
 inline void onBinaryMessageCallback(const byte data[], const size_t length);
 inline void handleBinaryRequest(const byte data[], const size_t length);
+inline void handleBinaryCommand(const byte data[], const size_t length);
 inline void handleUnknownBinaryMessage(const byte data[], const size_t length);
 inline void handleBinaryDataRequest(const byte data[], const size_t length);
 inline void handleBinaryDataImageRequest(const byte data[], const size_t length);
 inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t length);
 inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const size_t length);
+inline void handleBinaryMoveCommand(const byte data[], const size_t length);
 inline void handleUnknownBinaryRequest(const byte data[], const size_t length);
 inline void handleUnknownBinaryDataRequest(const byte data[], const size_t length);
 
@@ -167,6 +170,10 @@ inline void onBinaryMessageCallback(const byte data[], const size_t length)
       handleBinaryRequest(data + 1, length - 1);
       break;
 
+   case MessageHeader::MessageType::Command:
+      handleBinaryCommand(data + 1, length - 1);
+      break;
+
    default:
       handleUnknownBinaryMessage(data, length);
       break;
@@ -186,6 +193,21 @@ inline void handleBinaryRequest(const byte data[], const size_t length)
 
    default:
       handleUnknownBinaryRequest(data, length);
+      break;
+   }
+}
+
+inline void handleBinaryCommand(const byte data[], const size_t length)
+{
+   const byte commandType = data[0];
+   switch (commandType)
+   {
+   case MessageHeader::CommandType::Move:
+      handleBinaryMoveCommand(data + 1, length - 1);
+      break;
+
+   default:
+      // TODO
       break;
    }
 }
@@ -273,7 +295,7 @@ inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const 
       char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
                  MessageHeader::MeasurementType::Rotation, MessageHeader::RotationUnit::Degrees};
 
-      SensorController::AttitudeController::Measurement::getRotationDegrees(c+4);
+      SensorController::AttitudeController::Measurement::getRotationDegrees(c + 4);
       client.sendBinary(c, 16);
       break;
    }
@@ -286,6 +308,31 @@ inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const 
 
    default:
       break;
+   }
+}
+
+inline void handleBinaryMoveCommand(const byte data[], const size_t length)
+{
+   // TODO
+   const byte motorSelection = data[0];
+   const byte moveDirection = data[1];
+
+   if (motorSelection & MessageHeader::MotorSelection::First) {
+      if (moveDirection == MessageHeader::MoveDirection::Forward)
+         MotorController::motorLeft.rotateForward();
+      else if (moveDirection == MessageHeader::MoveDirection::Backward)
+         MotorController::motorLeft.rotateBackward();
+      else
+         MotorController::motorLeft.rotateStop();
+   }
+
+   if (motorSelection & MessageHeader::MotorSelection::Second) {
+      if (moveDirection == MessageHeader::MoveDirection::Forward)
+         MotorController::motorRight.rotateForward();
+      else if (moveDirection == MessageHeader::MoveDirection::Backward)
+         MotorController::motorRight.rotateBackward();
+      else
+         MotorController::motorRight.rotateStop();
    }
 }
 
