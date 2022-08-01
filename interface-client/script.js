@@ -29,6 +29,11 @@ const uriInputField = document.getElementById("uri-input");
 const rotationDegreesText = document.getElementById("rotation-degrees-text");
 const rotationDegreesButton = document.getElementById("rotation-degrees-button");
 
+const goForwardButton = document.getElementById("go-forward-button");
+const goBackwardButton = document.getElementById("go-backward-button");
+const rotateRightButton = document.getElementById("rotate-right-button");
+const rotateLeftButton = document.getElementById("rotate-left-button");
+
 const sideBar = document.getElementById("sidebar");
 const stateCheatList = document.getElementById("menu-state-cheatlist");
 const captureButton = document.getElementById("capture-button");
@@ -85,6 +90,12 @@ function initiate() {
         console.log("sent request: " + request);
 
         globalThis.clientStatus = ClientStatus.WaitingForMeasurements;
+    });
+
+    goForwardButton.addEventListener('click', context => {
+        const request = new Uint8Array([]); // TODO
+        serverSocket.send(request);
+        console.log("sent request: " + request);
     });
 
     //setupLayout();
