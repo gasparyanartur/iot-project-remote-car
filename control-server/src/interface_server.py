@@ -4,8 +4,8 @@ from typing import Callable
 import websockets
 import asyncio
 
-from message_types import DataTypes, MessageTypes, RequestTypes
-from message_types import MeasurementType, RotationUnit
+from .message_types import DataTypes, MessageTypes, RequestTypes
+from .message_types import MeasurementType, RotationUnit
 
 MessageType = str | bytes
 SocketType = websockets.WebSocketServerProtocol
@@ -269,6 +269,7 @@ def connection_factory():
 
 
 def initiate_server():
+    print("Initiating server")
     connections = connection_factory()
 
     event_loop = asyncio.new_event_loop()
@@ -279,6 +280,7 @@ def initiate_server():
         connections[ClientNames.interface].start()
     ]
     try:
+        print("Opening connections")
         event_loop.run_until_complete(asyncio.gather(*routines))
     except DeprecationWarning:
         ...

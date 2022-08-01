@@ -1,8 +1,8 @@
-from . import src
+from .src import interface_server
 
 
 def main():
-    src.server.run_server()
+    interface_server.main()
 
 
 if __name__ == "__main__":
