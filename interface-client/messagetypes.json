@@ -11,11 +11,31 @@
     },
 
     "dataTypes": {
-        "image": 1
+        "image": 1,
+        "measurement": 2
     },
 
     "statusTypes": {
         "ok": 1,
         "fail": 2
+    },
+
+    "measurementType": {
+        "rotation": 1,
+        "acceleration": 2,
+        "gravity": 3
+    },
+
+    "rotationUnit": {
+        "quaternions": 1,
+        "radians": 2,
+        "degrees": 3
+    },
+
+    "accelerationType": {
+        "raw": 1,
+        "relative": 2,
+        "world": 3
     }
+
 }

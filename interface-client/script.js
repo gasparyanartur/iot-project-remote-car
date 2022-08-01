@@ -38,6 +38,18 @@ const sideBar = document.getElementById("sidebar");
 const stateCheatList = document.getElementById("menu-state-cheatlist");
 const captureButton = document.getElementById("capture-button");
 
+async function loadMessageTypes() {
+    const file = await fetch('messageTypes.json');
+    if (file.status === "404") {
+        console.error("Failed to read file containing message types");
+        return null;
+    }
+
+    return await file.json();
+}
+
+const messageTypes = loadMessageTypes();
+
 let currentState = State.Entry;
 let currentActiveMenu = ActiveMenu.Camera;
 let serverSocket = null;
@@ -85,7 +97,13 @@ function initiate() {
     });
 
     rotationDegreesButton.addEventListener('click', context => {
-        const request = new Uint8Array([0, 1, 2, 1, 3]);
+        const request = new Uint8Array([
+            messageTypes.messageTypes.request,
+            messageTypes.requestTypes.data,
+            messageTypes.dataTypes.measurement,
+            messageTypes.measurementTypes.rotation,
+            messageTypes.rotationUnit.degrees
+        ]);
         serverSocket.send(request);
         console.log("sent request: " + request);
 
@@ -93,7 +111,9 @@ function initiate() {
     });
 
     goForwardButton.addEventListener('click', context => {
-        const request = new Uint8Array([]); // TODO
+        const request = new Uint8Array([
+            
+        ]); // TODO
         serverSocket.send(request);
         console.log("sent request: " + request);
     });
@@ -246,7 +266,7 @@ async function handleWaitingForCameraFrame(message) {
     const data = new Uint8Array(message, 2);
     console.log(`Header: ${header}`)
 
-    if (header[0] == 2 && header[1] == 1) {
+    if (header[0] == messageTypes.messageTypes.data && header[1] == messageTypes.dataTypes.image) {
         cleanUpCurrentImage();
         const blob = new Blob([data], { type: 'image/jpeg' });
         const url = URL.createObjectURL(blob);
@@ -267,11 +287,11 @@ function parseByteVector(byteArray, startIndex, nFloats, dtype) {
         funcGetter = "getFloat32";
         size = 4;
     }
-    else if(dtype === "int32") {
+    else if (dtype === "int32") {
         funcGetter = "getInt32";
         size = 4;
     }
-    else if(dtype === "int16") {
+    else if (dtype === "int16") {
         funcGetter = "getInt16";
         size = 2;
     }
