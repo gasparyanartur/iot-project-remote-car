@@ -17,6 +17,14 @@ class CommandTypes:
     __slots__ = tuple()
 
     move: int = 1
+    rotate: int = 2
+
+
+class RotationDirection:
+    __slots__ = tuple()
+
+    right: int = 1
+    left: int = 2
 
 
 class MotorSelection:

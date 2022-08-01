@@ -4,7 +4,8 @@ from typing import Callable
 import websockets
 import asyncio
 
-from .message_types import CommandTypes, DataTypes, MessageTypes, MotorSelection, MoveDirection, RequestTypes
+from .message_types import CommandTypes, DataTypes, MessageTypes, RotationDirection
+from .message_types import MotorSelection, MoveDirection, RequestTypes
 from .message_types import MeasurementType, RotationUnit
 
 MessageType = str | bytes
@@ -40,6 +41,11 @@ def load_example_img():
 
 def set_state(state: dict[str, any], name: str, value: bool) -> None:
     state[name] = value
+
+
+def buffer_message(connections, name, message):
+    print(f"[{name}]: {message}")
+    connections[name].buffer(message)
 
 
 class Callback:
@@ -237,7 +243,7 @@ def connection_factory():
                     ),
                     lambda c, m: (
                         set_state(state, 'waiting_for_img', True),
-                        conns[ClientNames.robot].buffer(m)
+                        buffer_message(conns, ClientNames.robot, m)
                     )
                 ),
                 Callback(
@@ -251,20 +257,35 @@ def connection_factory():
                         m[4] == RotationUnit.degrees
                     ),
                     lambda c, m: (
-                        conns[ClientNames.robot].buffer(m),
+                        buffer_message(conns, ClientNames.robot, m)
                     )
                 ),
                 Callback(
                     lambda c, m: (
                         isinstance(m, bytes) and
-                        len(m) >= 4 and
+                        len(m) == 4 and
                         m[0] == MessageTypes.command and
                         m[1] == CommandTypes.move and
                         m[2] == MotorSelection.first_and_second and
-                        m[3] == MoveDirection.forward
+                        (m[3] == MoveDirection.forward or
+                         m[3] == MoveDirection.none or
+                         m[3] == MoveDirection.backward)
                     ),
                     lambda c, m: (
-                        conns[ClientNames.robot].buffer(m)
+                        buffer_message(conns, ClientNames.robot, m)
+                    )
+                ),
+                Callback(
+                    lambda c, m: (
+                        isinstance(m, bytes) and
+                        len(m) == 3 and
+                        m[0] == MessageTypes.command and
+                        m[1] == CommandTypes.rotate and
+                        (m[2] == RotationDirection.right or
+                         m[2] == RotationDirection.left)
+                    ),
+                    lambda c, m: (
+                        buffer_message(conns, ClientNames.robot, m)
                     )
                 )
             ],

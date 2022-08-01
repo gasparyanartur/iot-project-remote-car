@@ -9,7 +9,8 @@
         "data": 1
     },
     "commandType": {
-        "move": 1
+        "move": 1,
+        "rotate": 2
     },
     "motorSelection": {
         "first": 1,
@@ -20,6 +21,10 @@
         "none": 0,
         "forward": 1,
         "backward": 2
+    },
+    "rotationDirection": {
+        "right": 1,
+        "left": 2
     },
     "dataType": {
         "image": 1,

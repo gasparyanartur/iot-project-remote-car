@@ -25,6 +25,7 @@ inline void handleBinaryDataImageRequest(const byte data[], const size_t length)
 inline void handleBinaryDataMeasurementRequest(const byte data[], const size_t length);
 inline void handleBinaryDataMeasurementRotationRequest(const byte data[], const size_t length);
 inline void handleBinaryMoveCommand(const byte data[], const size_t length);
+inline void handleBinaryRotateCommand(const byte data[], const size_t length);
 inline void handleUnknownBinaryRequest(const byte data[], const size_t length);
 inline void handleUnknownBinaryDataRequest(const byte data[], const size_t length);
 
@@ -206,6 +207,9 @@ inline void handleBinaryCommand(const byte data[], const size_t length)
       handleBinaryMoveCommand(data + 1, length - 1);
       break;
 
+   case MessageHeader::CommandType::Rotate:
+      handleBinaryRotateCommand(data + 1, length - 1);
+
    default:
       // TODO
       break;
@@ -333,6 +337,20 @@ inline void handleBinaryMoveCommand(const byte data[], const size_t length)
          MotorController::motorRight.rotateBackward();
       else
          MotorController::motorRight.rotateStop();
+   }
+}
+
+inline void handleBinaryRotateCommand(const byte data[], const size_t length)
+{
+   const byte rotationDirection = data[0];
+   if (rotationDirection == MessageHeader::RotationDirection::Left) {
+      MotorController::motorLeft.rotateBackward();
+      MotorController::motorRight.rotateForward();
+   }
+   else if(rotationDirection == MessageHeader::RotationDirection::Right)
+   {
+      MotorController::motorLeft.rotateForward();
+      MotorController::motorRight.rotateBackward();
    }
 }
 

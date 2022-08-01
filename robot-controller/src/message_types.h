@@ -27,6 +27,13 @@ namespace MessageHeader
     namespace CommandType
     {
         const byte Move = 1;
+        const byte Rotate = 2;
+    }
+
+    namespace RotationDirection
+    {
+        const byte Right = 1;
+        const byte Left = 2;
     }
 
     namespace MotorSelection 

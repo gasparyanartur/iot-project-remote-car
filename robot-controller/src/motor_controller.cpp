@@ -8,16 +8,19 @@ void MotorController::MotorDC::setup()
 
 void MotorController::MotorDC::rotateForward()
 {
+    Serial.println("Rotating forwards");
     motorWrite(HIGH, LOW);
 }
 
 void MotorController::MotorDC::rotateBackward()
 {
+    Serial.println("Rotating backwards");
     motorWrite(LOW, HIGH);
 }
 
 void MotorController::MotorDC::rotateStop()
 {
+    Serial.println("Stopping motor");
     motorWrite(LOW, LOW);
 }
 

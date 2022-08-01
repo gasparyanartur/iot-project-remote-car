@@ -34,6 +34,7 @@ async function main() {
     const goBackwardButton = document.getElementById("go-backward-button");
     const rotateRightButton = document.getElementById("rotate-right-button");
     const rotateLeftButton = document.getElementById("rotate-left-button");
+    const stopButton = document.getElementById("stop-button");
 
     const sideBar = document.getElementById("sidebar");
     const stateCheatList = document.getElementById("menu-state-cheatlist");
@@ -118,6 +119,48 @@ async function main() {
                 messageTypes.commandType.move,
                 messageTypes.motorSelection.firstAndSecond,
                 messageTypes.moveDirection.forward
+            ]);
+            serverSocket.send(request);
+            console.log("sent request: " + request);
+        });
+
+        goBackwardButton.addEventListener('click', context => {
+            const request = new Uint8Array([
+                messageTypes.messageType.command,
+                messageTypes.commandType.move,
+                messageTypes.motorSelection.firstAndSecond,
+                messageTypes.moveDirection.backward
+            ]);
+            serverSocket.send(request);
+            console.log("sent request: " + request);
+        });
+
+        rotateLeftButton.addEventListener('click', context => {
+            const request = new Uint8Array([
+                messageTypes.messageType.command,
+                messageTypes.commandType.rotate,
+                messageTypes.rotationDirection.left
+            ]);
+            serverSocket.send(request);
+            console.log("sent request: " + request);
+        });
+
+        rotateRightButton.addEventListener('click', context => {
+            const request = new Uint8Array([
+                messageTypes.messageType.command,
+                messageTypes.commandType.rotate,
+                messageTypes.rotationDirection.right
+            ]);
+            serverSocket.send(request);
+            console.log("sent request: " + request);
+        });
+
+        stopButton.addEventListener('click', context => {
+            const request = new Uint8Array([
+                messageTypes.messageType.command,
+                messageTypes.commandType.move,
+                messageTypes.motorSelection.firstAndSecond,
+                messageTypes.moveDirection.stop
             ]);
             serverSocket.send(request);
             console.log("sent request: " + request);
