@@ -1,14 +1,14 @@
 {
-    "messageTypes": {
+    "messageType": {
         "request": 0,
         "status": 1,
         "data": 2,
         "command": 3
     },
-    "requestTypes": {
+    "requestType": {
         "data": 1
     },
-    "commandTypes": {
+    "commandType": {
         "move": 1
     },
     "motorSelection": {
@@ -21,11 +21,11 @@
         "forward": 1,
         "backward": 2
     },
-    "dataTypes": {
+    "dataType": {
         "image": 1,
         "measurement": 2
     },
-    "statusTypes": {
+    "statusType": {
         "ok": 1,
         "fail": 2
     },
