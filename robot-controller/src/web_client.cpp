@@ -75,24 +75,16 @@ void updateWebClient()
    if (client.available())
    {
       client.poll();
-
-      const auto serialInput = Serial.readString();
-      if (!serialInput.isEmpty())
-      {
-         Serial.printf("Sending following message: %s\n", serialInput.c_str());
-
-         if (serialInput.charAt(0) == '%')
-            client.sendBinary(serialInput.substring(1));
-         else if (serialInput == "cam")
-         {
-            client.send("cam");
-         }
-         else
-            client.send(serialInput);
-
-         Serial.flush();
-      }
    }
+}
+
+void sendMeasurements()
+{
+   char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
+              MessageHeader::MeasurementType::Rotation, MessageHeader::RotationUnit::Degrees};
+
+   SensorController::AttitudeController::Measurement::getRotationDegrees(c + 4);
+   client.sendBinary(c, 16);
 }
 
 void onMessageCallback(websockets::WebsocketsMessage message)
@@ -321,7 +313,8 @@ inline void handleBinaryMoveCommand(const byte data[], const size_t length)
    const byte motorSelection = data[0];
    const byte moveDirection = data[1];
 
-   if (motorSelection & MessageHeader::MotorSelection::First) {
+   if (motorSelection & MessageHeader::MotorSelection::First)
+   {
       if (moveDirection == MessageHeader::MoveDirection::Forward)
          MotorController::motorLeft.rotateForward();
       else if (moveDirection == MessageHeader::MoveDirection::Backward)
@@ -330,7 +323,8 @@ inline void handleBinaryMoveCommand(const byte data[], const size_t length)
          MotorController::motorLeft.rotateStop();
    }
 
-   if (motorSelection & MessageHeader::MotorSelection::Second) {
+   if (motorSelection & MessageHeader::MotorSelection::Second)
+   {
       if (moveDirection == MessageHeader::MoveDirection::Forward)
          MotorController::motorRight.rotateForward();
       else if (moveDirection == MessageHeader::MoveDirection::Backward)
@@ -343,11 +337,12 @@ inline void handleBinaryMoveCommand(const byte data[], const size_t length)
 inline void handleBinaryRotateCommand(const byte data[], const size_t length)
 {
    const byte rotationDirection = data[0];
-   if (rotationDirection == MessageHeader::RotationDirection::Left) {
+   if (rotationDirection == MessageHeader::RotationDirection::Left)
+   {
       MotorController::motorLeft.rotateBackward();
       MotorController::motorRight.rotateForward();
    }
-   else if(rotationDirection == MessageHeader::RotationDirection::Right)
+   else if (rotationDirection == MessageHeader::RotationDirection::Right)
    {
       MotorController::motorLeft.rotateForward();
       MotorController::motorRight.rotateBackward();

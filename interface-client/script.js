@@ -1,3 +1,5 @@
+const PriorityQueue = require("./priority-queue");
+
 async function main() {
     const State = {
         Entry: "entry-state",

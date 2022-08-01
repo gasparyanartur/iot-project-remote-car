@@ -8,6 +8,10 @@
 //#include "i2c_scanner.h"
 
 
+const u_long SETUP_DURATION = 10000;
+const u_long MEASURE_PERIOD = 100;
+u_long nextMeasurementTime = SETUP_DURATION + MEASURE_PERIOD;
+
 
 void setup() 
 {
@@ -34,7 +38,18 @@ void setup()
 }
 
 void loop() {
+  const auto t = millis();
+  if (t < SETUP_DURATION) {
+    return;
+  }
+
   updateWebClient();
   SensorController::AttitudeController::tick();
+
+  if (t > nextMeasurementTime)
+  {
+    sendMeasurements();
+    nextMeasurementTime = t + MEASURE_PERIOD;
+  }
 };
 
