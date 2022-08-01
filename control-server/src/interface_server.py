@@ -44,7 +44,7 @@ def set_state(state: dict[str, any], name: str, value: bool) -> None:
 
 
 def buffer_message(connections, name, message):
-    print(f"[{name}]: {message}")
+    #print(f"[{name}]: {message}")
     connections[name].buffer(message)
 
 

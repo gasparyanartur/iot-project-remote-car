@@ -327,7 +327,7 @@ async function main() {
 
     }
 
-    function parseByteVector(byteArray, startIndex, nFloats, dtype) {
+    function parseByteVector(byteArray, startIndex, amount, dtype) {
         let funcGetter = null;
         let size = null;
 
@@ -337,6 +337,10 @@ async function main() {
         }
         else if (dtype === "int32") {
             funcGetter = "getInt32";
+            size = 4;
+        }
+        else if (dtype === "uint32") {
+            funcGetter = "getUint32";
             size = 4;
         }
         else if (dtype === "int16") {
@@ -352,10 +356,10 @@ async function main() {
             return [];
         }
 
-        const endIndex = startIndex + 4 * nFloats;
+        const endIndex = startIndex + size * amount;
         if (endIndex > byteArray.length) {
             console.error(
-                "Attempted to get " + nFloats +
+                "Attempted to get " + amount +
                 " floats from array " + byteArray +
                 " starting at " + startIndex
             );
@@ -365,7 +369,7 @@ async function main() {
         const view = new DataView(byteArray.buffer);
         const floatArray = [];
         for (let i = startIndex; i < endIndex; i += size) {
-            floatArray.push(view[funcGetter](i, true));
+            floatArray.push(view[funcGetter](i+byteArray.byteOffset, true));
         }
 
         return floatArray;
@@ -373,9 +377,11 @@ async function main() {
 
     function handleWaitingForMeasurements(message) {
         const header = new Uint8Array(message, 0, 4);
-        const payload = new Uint8Array(message, 4);
-        const floatVector = parseByteVector(payload, 0, 3, "float32");
-        console.log("measurements", floatVector);
+        const timeStamp = new Uint8Array(message, 4, 8);
+        const payload = new Uint8Array(message, 8);
+        const timeStampVector = parseByteVector(timeStamp, 0, 1, "uint32");
+        const payloadVector = parseByteVector(payload, 0, 3, "float32");
+        console.log("time", timeStampVector, "measurements", payloadVector);
         clientStatus = ClientStatus.Idle;
     }
 
