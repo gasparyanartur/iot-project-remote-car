@@ -248,6 +248,7 @@
     "fstream": "cpp",
     "istream": "cpp",
     "ostream": "cpp",
-    "sstream": "cpp"
+    "sstream": "cpp",
+    "new": "cpp"
   }
 }

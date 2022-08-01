@@ -80,11 +80,20 @@ void updateWebClient()
 
 void sendMeasurements()
 {
-   char c[16]{MessageHeader::MessageType::Data, MessageHeader::DataType::Measurement,
-              MessageHeader::MeasurementType::Rotation, MessageHeader::RotationUnit::Degrees};
+   char *c = new char[20];
 
-   SensorController::AttitudeController::Measurement::getRotationDegrees(c + 4);
-   client.sendBinary(c, 16);
+   c[0] = MessageHeader::MessageType::Data;
+   c[1] = MessageHeader::DataType::Measurement;
+   c[2] = MessageHeader::MeasurementType::Rotation;
+   c[3] = MessageHeader::RotationUnit::Degrees;
+
+   const u_long t = millis();
+   memmove(c + 4, &t, 4);
+
+   SensorController::AttitudeController::Measurement::getRotationDegrees(c + 8);
+   client.sendBinary(c, 20);
+
+   delete c;
 }
 
 void onMessageCallback(websockets::WebsocketsMessage message)

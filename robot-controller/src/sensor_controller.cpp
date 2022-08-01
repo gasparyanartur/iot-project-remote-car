@@ -148,7 +148,10 @@ namespace SensorController
             void getRotationDegrees(char *deg)
             {
                 memcpy(deg, rotEulerDegMeasure, 12);
+
+#ifdef _DISPLAY_MEASUREMENTS
                 Measurement::displayVector("deg measurement", Measurement::rotEulerDegMeasure);
+#endif
             }
 
         }
@@ -157,7 +160,6 @@ namespace SensorController
         {
             Status::isInterruptDown = true;
         }
-
 
         inline uint8_t GetCurrentFIFOPacket(uint8_t *data, uint16_t max_loops)
         {
@@ -193,7 +195,6 @@ namespace SensorController
         {
             Serial.println("Initializing attitude sensor...");
 
-            // Wire.begin(0x68u, Pins::SDA, Pins::SCL);
             Wire.begin();
             Wire.setClock(CLOCK_FREQ);
 
