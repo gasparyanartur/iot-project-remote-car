@@ -1,4 +1,9 @@
+const { createMap } = require('./map.js');
+
+console.log(createMap);
+
 async function main() {
+    const a = await createMap();
     const State = {
         Entry: "entry-state",
         Active: "active-state",
@@ -41,7 +46,7 @@ async function main() {
     const captureButton = document.getElementById("capture-button");
 
     async function loadMessageTypes() {
-        const file = await fetch('messageTypes.json');
+        const file = await fetch('../data/messageTypes.json');
         if (file.status === "404") {
             console.error("Failed to read file containing message types");
             return null;
@@ -165,6 +170,7 @@ async function main() {
             serverSocket.send(request);
             console.log("sent request: " + request);
         });
+
 
         //setupLayout();
     }
@@ -369,7 +375,7 @@ async function main() {
         const view = new DataView(byteArray.buffer);
         const floatArray = [];
         for (let i = startIndex; i < endIndex; i += size) {
-            floatArray.push(view[funcGetter](i+byteArray.byteOffset, true));
+            floatArray.push(view[funcGetter](i + byteArray.byteOffset, true));
         }
 
         return floatArray;

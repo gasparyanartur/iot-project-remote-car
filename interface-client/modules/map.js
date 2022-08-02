@@ -1,6 +1,8 @@
+const { dictApply } = require('./utils');
+
 const createMap = async () => {
     const readSpecs = async () => {
-        const file = await fetch('roomspecs.json');
+        const file = await fetch('../data/roomspecs.json');
 
         if (file.status == 404) {
             console.log("Failed to read file");
@@ -70,3 +72,5 @@ const createMap = async () => {
 
     return { canvas, render };
 };
+
+module.exports = { createMap };

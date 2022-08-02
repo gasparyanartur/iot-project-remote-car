@@ -6,3 +6,5 @@ function dictApply(dict, keys, fn) {
     keys.forEach(k => { nd[k] = fn(dict[k]); });
     return nd;
 }
+
+module.exports = { dictApply };
