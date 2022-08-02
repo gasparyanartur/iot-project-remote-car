@@ -33,7 +33,7 @@ main {
 }
 
 #map {
-    background-color:  slategray;
+    background-color: slategray;
 }
 
 .hidden {
@@ -54,4 +54,8 @@ main {
     background-color: red;
     order: -1;
     top: 5vh;
+}
+
+.chart {
+    background-color: white;
 }

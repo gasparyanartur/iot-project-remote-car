@@ -1,6 +1,5 @@
 const { createMap } = require('./map.js');
-
-console.log(createMap);
+const { createChart } = require('./charts.js');
 
 async function main() {
     const a = await createMap();
@@ -56,7 +55,6 @@ async function main() {
     }
 
     const messageTypes = await loadMessageTypes();
-    console.log(messageTypes)
 
     let currentState = State.Entry;
     let currentActiveMenu = ActiveMenu.Camera;
@@ -64,6 +62,8 @@ async function main() {
     let clientStatus = ClientStatus.Idle;
 
     let currentImageURL = null;
+
+    const rotationChart = createChart('rotation-chart');
 
     function initiate() {
         uriConnectButton.addEventListener("click", async (context) => {
@@ -170,7 +170,6 @@ async function main() {
             serverSocket.send(request);
             console.log("sent request: " + request);
         });
-
 
         //setupLayout();
     }
