@@ -2,7 +2,6 @@ const { createMap } = require('./map.js');
 const { createChart } = require('./charts.js');
 
 async function main() {
-    const a = await createMap();
     const State = {
         Entry: "entry-state",
         Active: "active-state",
@@ -63,7 +62,7 @@ async function main() {
 
     let currentImageURL = null;
 
-    const rotationChart = createChart('rotation-chart');
+    const {rotationChart, updateChart, addData} = await createChart('rotation-chart');
 
     function initiate() {
         uriConnectButton.addEventListener("click", async (context) => {
@@ -171,6 +170,8 @@ async function main() {
             console.log("sent request: " + request);
         });
 
+        addData(0, 50);
+        updateChart();
         //setupLayout();
     }
 
