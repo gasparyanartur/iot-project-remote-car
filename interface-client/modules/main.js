@@ -186,8 +186,14 @@ async function main() {
 
     function mainloop() {
         updateChart();
-        console.log(measurementBuffer);
-        addData('rotation-chart', 'rotation-x', getElapsedTime(), 10);
+        while (measurementBuffer.length) {
+            const measurement = measurementBuffer.pop();
+            if (measurement.name == "rotation") {
+                addData('rotation-chart', 'rotation-x', measurement.time, measurement.payload[0]);
+                addData('rotation-chart', 'rotation-y', measurement.time, measurement.payload[1]);
+                addData('rotation-chart', 'rotation-z', measurement.time, measurement.payload[2]);
+            }
+        }
     }
 
     function setupLayout() {
