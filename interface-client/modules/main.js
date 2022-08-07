@@ -170,8 +170,22 @@ async function main() {
             console.log("sent request: " + request);
         });
 
-        addData(0, 50);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
+        addData('rotation-chart', 'rotation-x', 2);
         updateChart();
+
+        setInterval(() => {
+            updateChart();
+        }, 100);
         //setupLayout();
     }
 
