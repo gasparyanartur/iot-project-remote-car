@@ -43,6 +43,9 @@ async function main() {
     const stateCheatList = document.getElementById("menu-state-cheatlist");
     const captureButton = document.getElementById("capture-button");
 
+    const measurementBuffer = [];
+    const mainloopPeriod = 1000;
+
     const startTime = new Date().getTime();
 
     async function loadMessageTypes() {
@@ -65,7 +68,7 @@ async function main() {
 
     let currentImageURL = null;
 
-    const {rotationChart, updateChart, addData} = await createChart('rotation-chart');
+    const { rotationChart, updateChart, addData } = await createChart('rotation-chart');
 
     function getElapsedTime() {
         return new Date().getTime() - startTime;
@@ -177,15 +180,14 @@ async function main() {
             console.log("sent request: " + request);
         });
 
-        addData('rotation-chart', 'rotation-x', 0, 2);
-        addData('rotation-chart', 'rotation-x', 0, 2);
-        updateChart();
-
-        setInterval(() => {
-            updateChart();
-            addData('rotation-chart', 'rotation-x', getElapsedTime(), 10);
-        }, 100);
+        setInterval(mainloop, mainloopPeriod);
         //setupLayout();
+    }
+
+    function mainloop() {
+        updateChart();
+        console.log(measurementBuffer);
+        addData('rotation-chart', 'rotation-x', getElapsedTime(), 10);
     }
 
     function setupLayout() {
@@ -399,8 +401,19 @@ async function main() {
         const timeStamp = new Uint8Array(message, 4, 8);
         const payload = new Uint8Array(message, 8);
         const timeStampVector = parseByteVector(timeStamp, 0, 1, "uint32");
-        const payloadVector = parseByteVector(payload, 0, 3, "float32");
-        console.log("time", timeStampVector, "measurements", payloadVector);
+
+        console.log(header[0]);
+
+        if (header[2] === messageTypes.measurementType.rotation) {
+            const payloadVector = parseByteVector(payload, 0, 3, "float32");
+
+            if (measurementBuffer.length < 5000) {
+                measurementBuffer.push(
+                    { name: "rotation", time: timeStampVector[0], payload: payloadVector },
+                );
+            }
+        }
+
         clientStatus = ClientStatus.Idle;
     }
 
