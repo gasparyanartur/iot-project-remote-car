@@ -43,6 +43,8 @@ async function main() {
     const stateCheatList = document.getElementById("menu-state-cheatlist");
     const captureButton = document.getElementById("capture-button");
 
+    const startTime = new Date().getTime();
+
     async function loadMessageTypes() {
         const file = await fetch('../data/messageTypes.json');
         if (file.status === "404") {
@@ -52,6 +54,7 @@ async function main() {
 
         return await file.json();
     }
+
 
     const messageTypes = await loadMessageTypes();
 
@@ -63,6 +66,10 @@ async function main() {
     let currentImageURL = null;
 
     const {rotationChart, updateChart, addData} = await createChart('rotation-chart');
+
+    function getElapsedTime() {
+        return new Date().getTime() - startTime;
+    }
 
     function initiate() {
         uriConnectButton.addEventListener("click", async (context) => {
@@ -176,9 +183,7 @@ async function main() {
 
         setInterval(() => {
             updateChart();
-
-            const date = new Date();
-            addData('rotation-chart', 'rotation-x', date.getMilliseconds(), 10);
+            addData('rotation-chart', 'rotation-x', getElapsedTime(), 10);
         }, 100);
         //setupLayout();
     }

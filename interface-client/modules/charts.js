@@ -119,10 +119,11 @@ const createChart = async (chartName) => {
             for (let i = 0; i < viewDuration; i++) {
                 labels[i] = newBaseTime + i;
             }
+
         }
 
         const dataset = dataList[chartName][datasetIndex];
-        dataset[time] = data;
+        dataset[time - baseTime[chartName]] = data;
     }
 
     return { chart, updateChart, addData };
