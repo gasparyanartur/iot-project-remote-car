@@ -16,9 +16,23 @@ for (let i = 0; i < 10000; i++)
     labels.push(i);
 
 
-let updateTime = {
+let baseTime = {
     "rotation-chart": 0,
 };
+
+const viewDuration = 10000;
+
+const dataList = {
+    "rotation-chart": [[], [], []]
+}
+
+/*
+for (let i = 0; i < viewDuration; i++) {
+    dataList["rotation-chart"].forEach(li => {
+       li.push(null);
+    });
+}
+*/
 
 const configs = {
     "rotation-chart": {
@@ -28,17 +42,17 @@ const configs = {
             datasets: [{
                 label: 'x-rotation [degree]',
                 backgroundColor: 'rgb(255, 0, 0)',
-                data: [],
+                data: dataList["rotation-chart"][0],
             },
             {
                 label: 'y-rotation [degree]',
                 backgroundColor: 'rgb(0, 255, 0)',
-                data: [],
+                data: dataList["rotation-chart"][1],
             },
             {
                 label: 'z-rotation [degree]',
                 backgroundColor: 'rgb(0, 0, 255)',
-                data: [],
+                data: dataList["rotation-chart"][2],
             }],
 
         },
@@ -74,16 +88,12 @@ const createChart = async (chartName) => {
     const chartElement = document.getElementById(chartName);
     const chart = new Chart(chartElement, config);
 
-    function updateTime() {
-        updateChart[name] = getCurrentMillis();
-    }
-
     function updateChart() {
         chart.update();
-        updateTime();
+        console.log(dataList);
     }
 
-    function addData(chartName, datasetName, data) {
+    function addData(chartName, datasetName, time, data) {
         const conf = configs[chartName];
         if (conf === undefined) {
             console.error(`Could not find chart with name ${chartName}`);
@@ -96,12 +106,25 @@ const createChart = async (chartName) => {
             return null;
         }
 
-        const dataset = configs[chartName].data.datasets[datasetIndex];
 
-        dataset.data.push(data);
+        if (time > baseTime[name] + viewDuration) {
+            const newBaseTime = Math.floor(time / viewDuration) * viewDuration;
+
+            baseTime[name] = newBaseTime;
+            console.log(baseTime[name]);
+            dataList[chartName].forEach(d => {
+                d.length = 0;
+            });
+
+            for (let i = 0; i < viewDuration; i++) {
+                labels[i] = newBaseTime + i;
+            }
+        }
+
+        const dataset = dataList[chartName][datasetIndex];
+        dataset[time] = data;
     }
 
-    updateTime();
     return { chart, updateChart, addData };
 };
 
