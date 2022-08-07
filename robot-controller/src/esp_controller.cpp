@@ -9,7 +9,7 @@
 
 
 const u_long SETUP_DURATION = 10000;
-const u_long MEASURE_PERIOD = 100;
+const u_long MEASURE_PERIOD = 200;
 u_long nextMeasurementTime = SETUP_DURATION + MEASURE_PERIOD;
 
 

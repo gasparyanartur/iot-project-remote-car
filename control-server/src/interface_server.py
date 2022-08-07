@@ -187,7 +187,7 @@ def connection_factory():
                     )
                 ),
                 Callback(
-                    lambda c, m: True,
+                    lambda c, m: False,
                     lambda c, m: print_incoming_message(c, m)
                 ),
                 Callback(

@@ -1,10 +1,5 @@
 const { Chart } = require('chart.js');
 
-function getCurrentMillis() {
-    const date = new Date();
-    return date.getMilliseconds();
-}
-
 const datasetIndexes = {
     "rotation-x": 0,
     "rotation-y": 1,
@@ -25,14 +20,6 @@ const viewDuration = 10000;
 const dataList = {
     "rotation-chart": [[], [], []]
 }
-
-/*
-for (let i = 0; i < viewDuration; i++) {
-    dataList["rotation-chart"].forEach(li => {
-       li.push(null);
-    });
-}
-*/
 
 const configs = {
     "rotation-chart": {
@@ -71,8 +58,8 @@ const configs = {
                     }
                 },
                 y: {
-                    min: -360,
-                    max: 360,
+                    min: -180,
+                    max: 180,
                     ticks: {
                         stepSize: 90
                     }
@@ -88,12 +75,11 @@ const createChart = async (chartName) => {
     const chartElement = document.getElementById(chartName);
     const chart = new Chart(chartElement, config);
 
-    function updateChart() {
-        chart.update();
-        console.log(dataList);
+    async function updateChart() {
+        chart.update('none');
     }
 
-    function addData(chartName, datasetName, time, data) {
+    async function addData(chartName, datasetName, time, data) {
         const conf = configs[chartName];
         if (conf === undefined) {
             console.error(`Could not find chart with name ${chartName}`);
@@ -107,11 +93,10 @@ const createChart = async (chartName) => {
         }
 
 
-        if (time > baseTime[name] + viewDuration) {
+        if (time > baseTime[name] + viewDuration || time < baseTime[name]) {
             const newBaseTime = Math.floor(time / viewDuration) * viewDuration;
 
             baseTime[name] = newBaseTime;
-            console.log(baseTime[name]);
             dataList[chartName].forEach(d => {
                 d.length = 0;
             });

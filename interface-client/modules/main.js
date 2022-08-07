@@ -44,7 +44,7 @@ async function main() {
     const captureButton = document.getElementById("capture-button");
 
     const measurementBuffer = [];
-    const mainloopPeriod = 1000;
+    const mainloopPeriod = 300;
 
     const startTime = new Date().getTime();
 
@@ -184,14 +184,14 @@ async function main() {
         //setupLayout();
     }
 
-    function mainloop() {
-        updateChart();
+    async function mainloop() {
+        await updateChart();
         while (measurementBuffer.length) {
             const measurement = measurementBuffer.pop();
             if (measurement.name == "rotation") {
-                addData('rotation-chart', 'rotation-x', measurement.time, measurement.payload[0]);
-                addData('rotation-chart', 'rotation-y', measurement.time, measurement.payload[1]);
-                addData('rotation-chart', 'rotation-z', measurement.time, measurement.payload[2]);
+                await addData('rotation-chart', 'rotation-x', measurement.time, measurement.payload[0]);
+                await addData('rotation-chart', 'rotation-y', measurement.time, measurement.payload[1]);
+                await addData('rotation-chart', 'rotation-z', measurement.time, measurement.payload[2]);
             }
         }
     }
@@ -407,8 +407,6 @@ async function main() {
         const timeStamp = new Uint8Array(message, 4, 8);
         const payload = new Uint8Array(message, 8);
         const timeStampVector = parseByteVector(timeStamp, 0, 1, "uint32");
-
-        console.log(header[0]);
 
         if (header[2] === messageTypes.measurementType.rotation) {
             const payloadVector = parseByteVector(payload, 0, 3, "float32");
