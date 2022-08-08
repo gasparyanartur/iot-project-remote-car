@@ -13,8 +13,8 @@ namespace SensorController
 
         namespace Measurement
         {
-            void getRotationDegrees(float deg[3]);
-            void getRotationDegrees(char *deg);
+            void getRotationDegrees(char *data);
+            void getAccelerationWorld(char *data);
         }
 
     }

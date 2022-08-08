@@ -68,7 +68,8 @@ async function main() {
 
     let currentImageURL = null;
 
-    const { rotationChart, updateChart, addData } = await createChart('rotation-chart');
+    const { rotationChart, updateChart: updateRotationChart, addData: addRotationData } = await createChart('rotation-chart');
+    const { accelerationChart, updateChart: updateAccelerationChart, addData: addAccelerationData } = await createChart('acceleration-chart');
 
     function getElapsedTime() {
         return new Date().getTime() - startTime;
@@ -185,13 +186,19 @@ async function main() {
     }
 
     async function mainloop() {
-        await updateChart();
+        await Promise.all([updateRotationChart(), updateAccelerationChart()]);
+
         while (measurementBuffer.length) {
             const measurement = measurementBuffer.pop();
             if (measurement.name == "rotation") {
-                await addData('rotation-chart', 'rotation-x', measurement.time, measurement.payload[0]);
-                await addData('rotation-chart', 'rotation-y', measurement.time, measurement.payload[1]);
-                await addData('rotation-chart', 'rotation-z', measurement.time, measurement.payload[2]);
+                await addRotationData('rotation-chart', 'rotation-x', measurement.time, measurement.payload[0]);
+                await addRotationData('rotation-chart', 'rotation-y', measurement.time, measurement.payload[1]);
+                await addRotationData('rotation-chart', 'rotation-z', measurement.time, measurement.payload[2]);
+            }
+            else if (measurement.name == "acceleration") {
+                await addRotationData('acceleration-chart', 'acceleration-x', measurement.time, measurement.payload[0]);
+                await addRotationData('acceleration-chart', 'acceleration-y', measurement.time, measurement.payload[1]);
+                await addRotationData('acceleration-chart', 'acceleration-z', measurement.time, measurement.payload[2]);
             }
         }
     }
@@ -290,7 +297,6 @@ async function main() {
     }
 
     function handleMessage(message) {
-        console.log(`Received message ${message.data}`);
         switch (globalThis.clientStatus) {
             case ClientStatus.Idle:
                 break;
@@ -408,12 +414,23 @@ async function main() {
         const payload = new Uint8Array(message, 8);
         const timeStampVector = parseByteVector(timeStamp, 0, 1, "uint32");
 
+
         if (header[2] === messageTypes.measurementType.rotation) {
             const payloadVector = parseByteVector(payload, 0, 3, "float32");
 
             if (measurementBuffer.length < 5000) {
                 measurementBuffer.push(
                     { name: "rotation", time: timeStampVector[0], payload: payloadVector },
+                );
+            }
+        }
+
+        else if (header[2] === messageTypes.measurementType.acceleration) {
+            const payloadVector = parseByteVector(payload, 0, 3, "int16");
+
+            if (measurementBuffer.length < 5000) {
+                measurementBuffer.push(
+                    { name: "acceleration", time: timeStampVector[0], payload: payloadVector },
                 );
             }
         }

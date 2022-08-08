@@ -59,3 +59,7 @@ main {
 .chart {
     background-color: white;
 }
+
+#charts-menu {
+    flex-direction: row;
+}

@@ -138,19 +138,25 @@ namespace SensorController
                 Serial.printf("%s: (%f, %f, %f, %f)\n", label.c_str(), vector.x, vector.y, vector.z, vector.w);
             }
 
-            void getRotationDegrees(float *deg)
+            void getRotationDegrees(char *data)
             {
-                deg[0] = rotEulerDegMeasure[0];
-                deg[1] = rotEulerDegMeasure[1];
-                deg[2] = rotEulerDegMeasure[2];
-            }
-
-            void getRotationDegrees(char *deg)
-            {
-                memcpy(deg, rotEulerDegMeasure, 12);
+                memcpy(data, rotEulerDegMeasure, 12);
 
 #ifdef _DISPLAY_MEASUREMENTS
-                Measurement::displayVector("deg measurement", Measurement::rotEulerDegMeasure);
+                Measurement::displayVector("Rotation (degrees)", Measurement::rotEulerDegMeasure);
+#endif
+            }
+
+            void getAccelerationWorld(char *data)
+            {
+                memcpy(data, &worldAccelMeasure.x, 6);  	// The VectorInt16 class stores x, y, z sequentially
+
+                //memcpy(data + 0, &worldAccelMeasure.x, 2);
+                //memcpy(data + 2, &worldAccelMeasure.y, 2);
+                //memcpy(data + 4, &worldAccelMeasure.z, 2);
+
+#ifdef _DISPLAY_MEASUREMENTS
+                Measurement::displayVector("Acceleration (world)", Measurement::rotEulerDegMeasure);
 #endif
             }
 

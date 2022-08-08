@@ -3,7 +3,10 @@ const { Chart } = require('chart.js');
 const datasetIndexes = {
     "rotation-x": 0,
     "rotation-y": 1,
-    "rotation-z": 2
+    "rotation-z": 2,
+    "acceleration-x": 0,
+    "acceleration-y": 1,
+    "acceleration-z": 2,
 };
 
 const labels = [];
@@ -18,7 +21,8 @@ let baseTime = {
 const viewDuration = 10000;
 
 const dataList = {
-    "rotation-chart": [[], [], []]
+    "rotation-chart": [[], [], []],
+    "acceleration-chart": [[], [], []]
 }
 
 const configs = {
@@ -62,6 +66,51 @@ const configs = {
                     max: 180,
                     ticks: {
                         stepSize: 90
+                    }
+                },
+            },
+        }
+    },
+    "acceleration-chart": {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'x-acceleration [m/s^2]',
+                backgroundColor: 'rgb(255, 0, 0)',
+                data: dataList["rotation-chart"][0],
+            },
+            {
+                label: 'y-acceleration [m/s^2]',
+                backgroundColor: 'rgb(0, 255, 0)',
+                data: dataList["rotation-chart"][1],
+            },
+            {
+                label: 'z-acceleration [m/s^2]',
+                backgroundColor: 'rgb(0, 0, 255)',
+                data: dataList["rotation-chart"][2],
+            }],
+
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    min: 0,
+                    max: 9999,
+                    ticks: {
+                        stepSize: 100
+                    },
+                    title: {
+                        display: true,
+                        text: (ctx) => 'Time [ms]',
+                    }
+                },
+                y: {
+                    min: -50,
+                    max: 50,
+                    ticks: {
+                        stepSize: 1000
                     }
                 },
             },

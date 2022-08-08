@@ -93,6 +93,12 @@ void sendMeasurements()
    SensorController::AttitudeController::Measurement::getRotationDegrees(c + 8);
    client.sendBinary(c, 20);
 
+   c[2] = MessageHeader::MeasurementType::Acceleration;
+   c[3] = MessageHeader::AccelerationType::Relative;
+
+   SensorController::AttitudeController::Measurement::getAccelerationWorld(c + 8);
+   client.sendBinary(c, 14);
+
    delete c;
 }
 

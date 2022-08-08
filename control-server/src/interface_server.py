@@ -15,6 +15,9 @@ TestType = Callable[['Connection', SocketType, MessageType], bool]
 CallbackType = Callable[['Connection', SocketType, MessageType], None]
 
 
+LOG_INCOMING = False
+
+
 class ClientNames:
     __slots__ = tuple()
 
@@ -187,7 +190,7 @@ def connection_factory():
                     )
                 ),
                 Callback(
-                    lambda c, m: False,
+                    lambda c, m: LOG_INCOMING,
                     lambda c, m: print_incoming_message(c, m)
                 ),
                 Callback(
@@ -195,9 +198,7 @@ def connection_factory():
                         isinstance(m, bytes) and
                         len(m) >= 4 and
                         m[0] == MessageTypes.data and
-                        m[1] == DataTypes.measurement and
-                        m[2] == MeasurementType.rotation and
-                        m[3] == RotationUnit.degrees
+                        m[1] == DataTypes.measurement
                     ),
                     lambda c, m: (
                         conns[ClientNames.interface].buffer(m)
@@ -219,7 +220,7 @@ def connection_factory():
             state,
             [
                 Callback(
-                    lambda c, m: True,
+                    lambda c, m: LOG_INCOMING,
                     lambda c, m: print_incoming_message(c, m)
                 ),
                 Callback(
