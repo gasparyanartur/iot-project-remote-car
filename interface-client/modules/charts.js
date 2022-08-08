@@ -156,8 +156,7 @@ const createChart = async (chartName) => {
 
         }
 
-        const dataset = dataList[chartName][datasetIndex];
-        dataset[time - baseTime[chartName]] = data;
+        dataList[chartName][datasetIndex][time - baseTime[chartName]] = data;
     }
 
     return { chart, updateChart, addData };

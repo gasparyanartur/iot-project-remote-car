@@ -1,37 +1,9 @@
-const { createMap } = require('./map.js');
 const { createChart } = require('./charts.js');
 
 async function main() {
-    const State = {
-        Entry: "entry-state",
-        Active: "active-state",
-    }
 
-    const ActiveMenu = {
-        Camera: "camera-menu",
-        Map: "map-menu",
-        Measurements: "measurements-menu"
-    }
-
-    const ClientStatus = {
-        Idle: 0,
-        WaitingForCameraStatus: 1,
-        WaitingForCameraFrame: 2,
-    }
-
-    const ActivityStateClass = "activity-state";
-    const HiddenClass = "hidden";
-
-    const connectButton = document.getElementById("connect-button");
-    const camButton = document.getElementById("cam-button");
-    const mapButton = document.getElementById("map-button");
-    const measurementsButton = document.getElementById("measurements-button");
-    const helloButton = document.getElementById("hello-button");
     const uriConnectButton = document.getElementById("uri-connect-button");
-    const cameraDispay = document.getElementById("camera-display");
     const uriInputField = document.getElementById("uri-input");
-    const rotationDegreesText = document.getElementById("rotation-degrees-text");
-    const rotationDegreesButton = document.getElementById("rotation-degrees-button");
 
     const goForwardButton = document.getElementById("go-forward-button");
     const goBackwardButton = document.getElementById("go-backward-button");
@@ -39,14 +11,8 @@ async function main() {
     const rotateLeftButton = document.getElementById("rotate-left-button");
     const stopButton = document.getElementById("stop-button");
 
-    const sideBar = document.getElementById("sidebar");
-    const stateCheatList = document.getElementById("menu-state-cheatlist");
-    const captureButton = document.getElementById("capture-button");
-
     const measurementBuffer = [];
     const mainloopPeriod = 300;
-
-    const startTime = new Date().getTime();
 
     async function loadMessageTypes() {
         const file = await fetch('../data/messageTypes.json');
@@ -61,19 +27,10 @@ async function main() {
 
     const messageTypes = await loadMessageTypes();
 
-    let currentState = State.Entry;
-    let currentActiveMenu = ActiveMenu.Camera;
     let serverSocket = null;
-    let clientStatus = ClientStatus.Idle;
-
-    let currentImageURL = null;
 
     const { rotationChart, updateChart: updateRotationChart, addData: addRotationData } = await createChart('rotation-chart');
     const { accelerationChart, updateChart: updateAccelerationChart, addData: addAccelerationData } = await createChart('acceleration-chart');
-
-    function getElapsedTime() {
-        return new Date().getTime() - startTime;
-    }
 
     function initiate() {
         uriConnectButton.addEventListener("click", async (context) => {
@@ -85,47 +42,10 @@ async function main() {
             const success = await connectToServer(serverSocket, 2000);
             if (success) {
                 console.log(`Successfully connected to server at URL: ${serverSocket.url}`);
-                loadActiveMenu();
                 serverSocket.onmessage = handleMessage;
             }
             else
                 console.log("Failed to connect");
-        });
-
-        captureButton.addEventListener("click", (context) => {
-            const request = new Uint8Array([0, 1, 1]);
-            serverSocket.send(request);
-            globalThis.clientStatus = ClientStatus.WaitingForCameraFrame;
-        });
-
-        connectButton.addEventListener("click", (context) => {
-
-        });
-
-        camButton.addEventListener('click', context => {
-            updateActiveMenu(ActiveMenu.Camera);
-        });
-
-        mapButton.addEventListener('click', context => {
-            updateActiveMenu(ActiveMenu.Map);
-        });
-
-        measurementsButton.addEventListener('click', context => {
-            updateActiveMenu(ActiveMenu.Measurements);
-        });
-
-        rotationDegreesButton.addEventListener('click', context => {
-            const request = new Uint8Array([
-                messageTypes.messageType.request,
-                messageTypes.requestType.data,
-                messageTypes.dataType.measurement,
-                messageTypes.measurementType.rotation,
-                messageTypes.rotationUnit.degrees
-            ]);
-            serverSocket.send(request);
-            console.log("sent request: " + request);
-
-            globalThis.clientStatus = ClientStatus.WaitingForMeasurements;
         });
 
         goForwardButton.addEventListener('click', context => {
@@ -182,12 +102,9 @@ async function main() {
         });
 
         setInterval(mainloop, mainloopPeriod);
-        //setupLayout();
     }
 
     async function mainloop() {
-        await Promise.all([updateRotationChart(), updateAccelerationChart()]);
-
         while (measurementBuffer.length) {
             const measurement = measurementBuffer.pop();
             if (measurement.name == "rotation") {
@@ -201,73 +118,8 @@ async function main() {
                 await addRotationData('acceleration-chart', 'acceleration-z', measurement.time, measurement.payload[2]);
             }
         }
-    }
 
-    function setupLayout() {
-        Array.from(document.getElementsByClassName(ActivityStateClass)).forEach(element => {
-            if (element.classList.contains(currentState))
-                element.classList.remove(HiddenClass);
-            else
-                element.classList.add(HiddenClass);
-        });
-
-        stateCheatList.childNodes.forEach(child => {
-            child.addEventListener('click', (context) => {
-                const stateName = context.target.textContent;
-                const state = State[stateName];
-                updateCurrentState(state);
-            });
-        });
-
-        updateCurrentState(State.Active);
-        updateActiveMenu(ActiveMenu.Camera);
-    }
-
-    function initiateState(state) {
-        switch (state) {
-            default:
-                break;
-        }
-    }
-
-    function updateCurrentState(newState) {
-        if (newState == currentState)
-            return;
-
-        Array.from(document.getElementsByClassName(currentState)).forEach(element => {
-            element.classList.add(HiddenClass);
-        });
-
-        currentState = newState;
-
-        Array.from(document.getElementsByClassName(currentState)).forEach(element => {
-            element.classList.remove(HiddenClass);
-        });
-
-        initiateState(newState);
-    }
-
-    async function initateMenu(menu) {
-        switch (menu) {
-            case ActiveMenu.Map:
-                map = await createMap();
-                map.render();
-            default:
-                break;
-        }
-    }
-
-    function updateActiveMenu(newMenu) {
-        if (newMenu == currentActiveMenu)
-            return;
-
-        document.getElementById(currentActiveMenu).classList.add(HiddenClass);
-
-        currentActiveMenu = newMenu;
-
-        document.getElementById(currentActiveMenu).classList.remove(HiddenClass);
-
-        initateMenu(newMenu);
+        await Promise.all([updateRotationChart(), updateAccelerationChart()]);
     }
 
     async function connectToServer(socket, timeout = 2000) {
@@ -287,77 +139,22 @@ async function main() {
         }
     }
 
-    function loadActiveMenu() {
-        updateCurrentState(State.Entry);
-    }
-
-
     function logInvalidMessage(message) {
         console.log(`Received invalid message ${message.data} for status {clientStatus}`);
     }
 
     function handleMessage(message) {
-        switch (globalThis.clientStatus) {
-            case ClientStatus.Idle:
-                break;
+        const header = new Uint8Array(message.data, 0, 4);
+        const headerBytes = parseByteVector(header, 0, 4, 'uint8');
 
-            case ClientStatus.WaitingForCameraStatus:
-                handleWaitingForCameraStatus(message.data);
-                break;
-
-            case ClientStatus.WaitingForCameraFrame:
-                handleWaitingForCameraFrame(message.data);
-                break;
-
-            case ClientStatus.WaitingForMeasurements:
-                handleWaitingForMeasurements(message.data);
-                break;
-
-            default:
-                console.log("Received message while in invalid status {clientStatus}. Resetting to Idle");
-                clientStatus = ClientStatus.Idle;
-                break;
+        if (headerBytes[0] === messageTypes.messageType.data) {
+            if (headerBytes[1] === messageTypes.dataType.measurement) {
+                handleMeasurement(message.data);
+                return;
+            }
         }
-
-    }
-
-    function handleWaitingForCameraStatus(message) {
-        if (message === "ok")
-            clientStatus = ClientStatus.WaitingForCameraFrame;
-
-        else if (message === "fail") {
-            console.log("Failed to get camera frame");
-            clientStatus = ClientStatus.Idle;
-        }
-
-        else {
-            logInvalidMessage(message);
-        }
-    }
-
-    function cleanUpCurrentImage() {
-        if (globalThis.currentImageURL !== null) {
-            URL.revokeObjectURL(globalThis.currentImageURL);
-            globalThis.currentImageURL = null;
-        }
-    }
-
-    async function handleWaitingForCameraFrame(message) {
-        const header = new Int8Array(message, 0, 2);
-        const data = new Uint8Array(message, 2);
-        console.log(`Header: ${header}`)
-
-        if (header[0] == messageTypes.messageType.data && header[1] == messageTypes.dataType.image) {
-            cleanUpCurrentImage();
-            const blob = new Blob([data], { type: 'image/jpeg' });
-            const url = URL.createObjectURL(blob);
-            console.log("Created url at ")
-            const cameraImage = document.getElementById("camera-img");
-            const width = cameraImage.width;
-            cameraImage.src = url;
-            cameraImage.width = width;
-        }
-
+        
+        logInvalidMessage(message);
     }
 
     function parseByteVector(byteArray, startIndex, amount, dtype) {
@@ -384,6 +181,10 @@ async function main() {
             funcGetter = "getInt8";
             size = 1;
         }
+        else if (dtype === "uint8") {
+            funcGetter = "getUint8";
+            size = 1;
+        }
         else {
             console.error("Attemped to parse byte vector of unrecognized type " + dtype);
             return [];
@@ -393,7 +194,8 @@ async function main() {
         if (endIndex > byteArray.length) {
             console.error(
                 "Attempted to get " + amount +
-                " floats from array " + byteArray +
+                " bytes from array " + byteArray +
+                " with length " + byteArray.length +
                 " starting at " + startIndex
             );
             return [];
@@ -408,7 +210,7 @@ async function main() {
         return floatArray;
     }
 
-    function handleWaitingForMeasurements(message) {
+    function handleMeasurement(message) {
         const header = new Uint8Array(message, 0, 4);
         const timeStamp = new Uint8Array(message, 4, 8);
         const payload = new Uint8Array(message, 8);
@@ -435,7 +237,6 @@ async function main() {
             }
         }
 
-        clientStatus = ClientStatus.Idle;
     }
 
     initiate();

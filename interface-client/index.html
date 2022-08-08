@@ -12,33 +12,9 @@
 
 <body>
     <main>
-        <nav>
-            <button id="connect-button" class="activity-state entry-state hidden">Connection</button>
-            <button id="cam-button" class="activity-state active-state hidden">Camera</button>
-            <button id="map-button" class="activity-state active-state hidden">Map</button>
-            <button id="measurements-button" class="activity-state active-state hidden">Measurements</button>
-        </nav>
-
         <section id="menu">
             <div class="menu activity-state entry-state" id="connection-menu">
                 <span><span>URI: </span><input id="uri-input"><button id="uri-connect-button">Connect</button></span>
-            </div>
-
-            <div id="camera-menu" class="menu activity-state active-state active-menu hidden">
-                <button id="capture-button">Capture</button>
-                <div id="camera-frame">
-                    <img id="camera-img" width="600px">
-                </div>
-            </div>
-
-            <div id="map-menu" class="menu activity-state active-state active-menu hidden">
-                <canvas id="map-canvas" width="400px" height="400px"></canvas>
-            </div>
-
-            <div id="measurements-menu" class="menu activity-state active-state active-menu">
-                <span>Rotation (degrees): <span id="rotation-degrees-text"></span>
-                    <button id="rotation-degrees-button">Get rotation (degrees)</button>
-                </span>
             </div>
 
             <div id="motor-menu" class="menu">
@@ -56,13 +32,6 @@
 
         </section>
     </main>
-    <section id="sidebar" class="hidden">
-        <ul id="menu-state-cheatlist">Menu State
-            <li><button>Entry</button></li>
-            <li><button>Active</button></li>
-        </ul>
-
-    </section>
 
 </body>
 
