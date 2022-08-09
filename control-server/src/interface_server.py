@@ -15,7 +15,7 @@ TestType = Callable[['Connection', SocketType, MessageType], bool]
 CallbackType = Callable[['Connection', SocketType, MessageType], None]
 
 
-LOG_INCOMING = True
+LOG_INCOMING = False
 
 
 class ClientNames:

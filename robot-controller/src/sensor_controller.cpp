@@ -6,6 +6,8 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 
+//#define _DISPLAY_MEASUREMENTS
+
 static const camera_config_t config{
     .pin_pwdn = PWDN_GPIO_NUM,
     .pin_reset = RESET_GPIO_NUM,
@@ -156,7 +158,7 @@ namespace SensorController
                 //memcpy(data + 4, &worldAccelMeasure.z, 2);
 
 #ifdef _DISPLAY_MEASUREMENTS
-                Measurement::displayVector("Acceleration (world)", Measurement::rotEulerDegMeasure);
+                Measurement::displayVector("Acceleration (world)", Measurement::worldAccelMeasure);
 #endif
             }
 

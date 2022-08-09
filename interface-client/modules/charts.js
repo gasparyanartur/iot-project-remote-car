@@ -9,13 +9,19 @@ const datasetIndexes = {
     "acceleration-z": 2,
 };
 
-const labels = [];
-for (let i = 0; i < 10000; i++)
-    labels.push(i);
+const labels = {
+    "rotation-chart": [],
+    "acceleration-chart": []
+};
 
+for (let i = 0; i < 10000; i++) {
+    labels["rotation-chart"].push(i);
+    labels["acceleration-chart"].push(i);
+}
 
 let baseTime = {
     "rotation-chart": 0,
+    "acceleration-chart": 0,
 };
 
 const viewDuration = 10000;
@@ -29,7 +35,7 @@ const configs = {
     "rotation-chart": {
         type: 'line',
         data: {
-            labels: labels,
+            labels: labels["rotation-chart"],
             datasets: [{
                 label: 'x-rotation [degree]',
                 backgroundColor: 'rgb(255, 0, 0)',
@@ -74,21 +80,21 @@ const configs = {
     "acceleration-chart": {
         type: 'line',
         data: {
-            labels: labels,
+            labels: labels["acceleration-chart"],
             datasets: [{
                 label: 'x-acceleration [m/s^2]',
                 backgroundColor: 'rgb(255, 0, 0)',
-                data: dataList["rotation-chart"][0],
+                data: dataList["acceleration-chart"][0],
             },
             {
                 label: 'y-acceleration [m/s^2]',
                 backgroundColor: 'rgb(0, 255, 0)',
-                data: dataList["rotation-chart"][1],
+                data: dataList["acceleration-chart"][1],
             },
             {
                 label: 'z-acceleration [m/s^2]',
                 backgroundColor: 'rgb(0, 0, 255)',
-                data: dataList["rotation-chart"][2],
+                data: dataList["acceleration-chart"][2],
             }],
 
         },
@@ -107,8 +113,8 @@ const configs = {
                     }
                 },
                 y: {
-                    min: -50,
-                    max: 50,
+                    min: -4000,
+                    max: 4000,
                     ticks: {
                         stepSize: 1000
                     }
@@ -119,7 +125,6 @@ const configs = {
 };
 
 const createChart = async (chartName) => {
-    const name = chartName;
     const config = configs[chartName];
     const chartElement = document.getElementById(chartName);
     const chart = new Chart(chartElement, config);
@@ -141,21 +146,19 @@ const createChart = async (chartName) => {
             return null;
         }
 
-
-        if (time > baseTime[name] + viewDuration || time < baseTime[name]) {
+        if (time > baseTime[chartName] + viewDuration || time < baseTime[chartName]) {
             const newBaseTime = Math.floor(time / viewDuration) * viewDuration;
 
-            baseTime[name] = newBaseTime;
+            baseTime[chartName] = newBaseTime;
             dataList[chartName].forEach(d => {
                 d.length = 0;
             });
 
             for (let i = 0; i < viewDuration; i++) {
-                labels[i] = newBaseTime + i;
+                labels[chartName][i] = newBaseTime + i;
             }
-
         }
-
+        
         dataList[chartName][datasetIndex][time - baseTime[chartName]] = data;
     }
 
