@@ -34,10 +34,12 @@ Regardless, the fact remains that autonomous robots are cool, and therefore a go
 The purpose of this project is to create a remote-controlled robot, which can then be improved upon in further work.
 It is meant to provide a mix of educational moments to learn IoT development, as well as a basis for future projects more tailored toward robotics.
 
-In practice, I believe the project will provide the experience needed in order to do hobby projects in the field of mobile robotics.
-Because the focus will be on learning and gaining knowledge, the goal is therefore not to create a viable product to deploy but to simply gain the practical experience of creating a working system.
+In practice, I believe the project provides the experience needed in order to do hobby projects in the field of mobile robotics.
+Because the focus is on learning and gaining knowledge, the goal is therefore not to create a viable product to deploy but to simply gain the practical experience of creating a working system.
 
 ### Material
+
+
 
 ### Computer setup
 
