@@ -9,17 +9,17 @@ The project is a robot car controlled remotely through WiFi.
 |-----------------|-----------------|-----------------|--------------------|
 | Artur Gasparyan |    ag223pe      | 09 August 2022  | 60h               |
 
-This section will explain how to replicate the project as well as elaborate on the system along with the corresponding design decisions.
+This section will explain how to replicate the project as well as elaborate on the system along with the corresponding design decisions. Some sections might be poorly ordered because the tutorial follows a strict template for the assignment, so one might need to skim the content before diving in further.
 
 The end goal of the project is to create a remote robot that can autonomously navigate in an environment given a desired destination.
 To this goal, the work up to this point can be seen as a subgoal.
 To create a mobile robot, one must first remotely control actuators and sensors over a network.
 
-In this project, a robot car was programmed to communicate with a server over a WiFi-connection.
+In this project, a robot car was programmed to communicate with a server over a WiFi connection.
 This server then communicates with a website over an additional server, which serves as the interface between human and robot.
 From this interface, a user can control the motors of the robot, and see the sensor values, which get broadcasted from the robot to the server.
 
-Due to my inexperience with IOT and embedded systems, this project took a considerable amount of time; roughly 60 hours. Much of this time was spent debugging external libraries which, as it turns out, have some slight incompatibilities with the hardware I selected.
+Due to my inexperience with IoT and embedded systems, this project took a considerable amount of time; roughly 60 hours. Much of this time was spent debugging external libraries which, as it turns out, have some slight incompatibilities with the hardware I selected.
 Regardless, the result is mostly functional in the sense that most remaining faults are known limitations within the scope of the project.
 
 ### Objective
@@ -55,6 +55,41 @@ This wire was bought from Electrokit using [this](https://www.electrokit.com/pro
 ![Solid core wire as found on the store page](tutorial/solid-core-wire.jpg)
 
 ### Computer setup
+
+The setup was divided in three parts, one for each subsystem.
+
+#### Robot
+
+Because the project was done using an ESP32, the choice of platforms was native ESP32, Arduino, and MicroPython.
+Since I was somewhat inexperienced with embedded development, I decided to go with the option that had the largest online community, which I determined to be the Arduino platform.
+
+Because I needed to work on the other systems which use different programming languages, I decided to use Visual Studio Code instead of the classical Arduino IDe.
+Visual Studio Code has a plugin called PlatformIO which provides many practical tools for embedded development.
+Since I had previous experience with C++ and Visual Studio Code, I was fine with the added complexity of PlatformIO for the benefits.
+
+Throughout the project, I ended up installing two additional libraries for the Arduino platform.
+The first one was [ArduinoWebsockets by gilmaimon](https://github.com/gilmaimon/ArduinoWebsockets), which allows somewhat smooth communication across a websocket for the ESP32.
+The second library was [mpu6050 by ElectroCats](https://github.com/ElectronicCats/mpu6050), which simplifies reading sensor values for the attitude sensor.
+Unfortunately, the second library has some slight incompatibilities with the ESP32 device, so I had to manually implement the changes described in [this blog post by Frank](https://www.fpaynter.com/2019/10/mpu6050-fifo-buffer-management-study/) (which I figured out as a result of weeks of debugging).
+
+#### Server
+
+The server is implemented in Python, version 3.10.
+It uses the [websockets library by aaugustin](https://pypi.org/project/websockets/), which provides fairly advanced functionality for asynchronous websocket communication.
+
+#### Interface
+
+Frontend communication is done using a classic website, which communicates with the Python server over a websocket.
+It is implemented with vanilla JavaScript, though minified using Watchify.
+Thus, to develop the frontend, one needs to install:
+
+* Node.js - Requirement for npm
+
+* npm - Package manager
+
+* watchify - To manage proper file management and code management
+
+* Chart.js - Library for displaying charts with JavaScript
 
 ### Putting everything together
 
