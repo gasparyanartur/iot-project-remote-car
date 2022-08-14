@@ -39,7 +39,20 @@ Because the focus is on learning and gaining knowledge, the goal is therefore no
 
 ### Material
 
+The core of the robot was made using an ESP32-WROVER, due to the low cost, WiFi compatibility, and camera integration.
+Along with the board came a plethora of peripherals and accessories, such as a motor driver and an attitude sensor (gyroscope and accelerometer).
+All of this was purchased together in a kit called *Freenove Ultimate Starter Kit for ESP32*, which can be found on Amazon using [this](https://www.amazon.se/gp/product/B08FM2NCST/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1) link.
 
+![Various components in the Freenove starter kit displayed on the store page.](tutorial/freenove-kit.jpg)
+
+The components of the car were purchased separately in a robot car kit, found on Kjell & Company using [this](https://www.kjell.com/se/produkter/el-verktyg/arduino/arduino-tillbehor/robotbyggsats-med-hjul-och-motor-p87065) link.
+
+![The package for the car kit found on the store page.](tutorial/car-kit.png)
+
+To connect the motor wire to the GPIO pins on the breadboard, an additional piece of solid-core AWG20 wire was soldered onto each one.
+This wire was bought from Electrokit using [this](https://www.electrokit.com/produkt/kopplingstrad-awg20-entradig-svart-m) link.
+
+![Solid core wire as found on the store page](tutorial/solid-core-wire.jpg)
 
 ### Computer setup
 
