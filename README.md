@@ -93,6 +93,58 @@ Thus, to develop the frontend, one needs to install:
 
 ### Putting everything together
 
+Due to the robot simply consisting of an ESP32, a sensor, a motor driver, and two DC motors, the wiring was fairly simple.
+Although the wiring is simple, the number of wires grew to be quite large and will therefore be included as text instead of the diagram to keep the image somewhat uncluttered.
+
+![An image of the robot with the wires looking like a mess](tutorial/wires-robot.jpg)
+
+![The pin-layout of the ESP32-WROVER, L293D, and MPU6050](tutorial/pin-layout.png)
+
+#### **MPU6050**
+
+| name | pin |
+| -- | -- |
+|SCL | GPIO22 |
+| SDA | GPIO21 |
+| GND | GND |
+| VCC | 5V |
+| INT | GPIO15 |
+
+#### **L203D**
+
+| name | pin |
+| -- | -- |
+| 1,2EN | 5V |
+| 1A | GPIO26 |
+| 1Y | MOTOR_L_NEG |
+| GND | GND |
+| GND | GND |
+| 2Y | MOTOR_L_POS |
+| 2A | GPIO27 |
+| VCC2 | 5V |
+| VCC1 | 5V |
+| 4A | GPIO19 |
+| 4Y | MOTOR_R_POS |
+| GND | GND |
+| GND | GND |
+| 3Y | MOTOR_R_NEG |
+| 3A | GPIO18 |
+| 3,4EN | 5V |
+
+#### **MOTOR_L**
+
+| name | pin |
+| -- | -- |
+| POS | L203D_2Y |
+| NEG | GND |
+
+#### **MOTOR_R**
+
+| name | pin |
+| -- | -- |
+| POS | L203D_4Y |
+| NEG | GND |
+
 ### Platform
 
 ### The code
