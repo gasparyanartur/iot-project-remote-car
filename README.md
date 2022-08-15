@@ -7,9 +7,9 @@ The project is a robot car controlled remotely through WiFi.
 
 **NOTE The tutorial is not finished yet, but it should be done in the afternoon of August 15th**
 
-| **Name**        | **Credentials** | **Date**        | **Estimated time** |
-|-----------------|-----------------|-----------------|--------------------|
-| Artur Gasparyan |    ag223pe      | 09 August 2022  | 60h               |
+| **Name**        | **Credentials** | **Date**        |
+|-----------------|-----------------|-----------------|
+| Artur Gasparyan |    ag223pe      | 09 August 2022  |
 
 This section will explain how to replicate the project as well as elaborate on the system along with the corresponding design decisions. Some sections might be poorly ordered because the tutorial follows a strict template for the assignment, so one might need to skim the content before diving in further.
 
@@ -21,7 +21,8 @@ In this project, a robot car was programmed to communicate with a server over a 
 This server then communicates with a website over an additional server, which serves as the interface between human and robot.
 From this interface, a user can control the motors of the robot, and see the sensor values, which get broadcasted from the robot to the server.
 
-Due to my inexperience with IoT and embedded systems, this project took a considerable amount of time; roughly 60 hours. Much of this time was spent debugging external libraries which, as it turns out, have some slight incompatibilities with the hardware I selected.
+Due to my inexperience with IoT and embedded systems, this project took a considerable amount of time; roughly 100 hours.
+Much of this time was spent debugging external libraries which, as it turns out, have some slight incompatibilities with the hardware I selected.
 Regardless, the result is mostly functional in the sense that most remaining faults are known limitations within the scope of the project.
 
 ### Objective
