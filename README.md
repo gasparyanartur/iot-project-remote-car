@@ -5,6 +5,8 @@ The project is a robot car controlled remotely through WiFi.
 
 ## Tutorial
 
+**NOTE The tutorial is not finished yet, but it should be done in the afternoon of August 15th**
+
 | **Name**        | **Credentials** | **Date**        | **Estimated time** |
 |-----------------|-----------------|-----------------|--------------------|
 | Artur Gasparyan |    ag223pe      | 09 August 2022  | 60h               |
