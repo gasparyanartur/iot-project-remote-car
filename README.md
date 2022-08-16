@@ -316,7 +316,7 @@ If one was to use them for more advanced purposes, such as data analysis and mac
 
 Here is a video demonstration where I display the current functionality of the project.
 
-... YOUTUBE ....
+[![Thumbnail of youtube video](https://youtu.be/qNUmGmW1lb0/0.jpg)](https://youtu.be/qNUmGmW1lb0)
 
 As one can see, the messaging has a tendency of being unstable.
 One pattern I've noticed is the control server sometimes bugging out and starting to send junk values to the ESP32.
