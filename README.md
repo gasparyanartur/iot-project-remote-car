@@ -180,6 +180,67 @@ Hosting the project locally ensures full control over the various components and
 
 ### The code
 
+There is too much code to explain in detail here, so it will be described in high level.
+For more details, see the source code in this repository.
+
+![A diagram of the components](tutorial/architecture-bg.png)
+
+#### **Robot Controller**
+
+Since the platform for the robot is Arduino-based, the code is formed after the classical Arduino workflow.
+That is, first an initilization routine is defined follow by a mainloop that will continously run as long as the device is powered.
+
+The initilization routine does the following things:
+
+* Connect to WiFi on the given IP address.
+
+* Connect to the control server's web socket on port 8001.
+
+* Initialize the attitude sensor.
+
+* Intialize the motors.
+
+The mainloop does roughly the following:
+
+* Update the sensor values.
+
+* Handle any received message from the control server using a callback.
+
+* Send the sensor values to the control server.
+
+#### **Control Server**
+
+The control server is responsible for maintaining two web sockets at the same time.
+Because the websockets library previously mentioned is asynchronous, one cannot send and receive messages at the same time in order to avoid potential conflicts.
+Therefore, one could not simply pass a message from the control server to the interface client and viceversa.
+This was resolved by storing all messages to be sent in a socalled "messagebox".
+For each connection, a "handler" was then created, which sent all messages in the message box before receiving any incoming ones.
+The following pseudocode illustrates the logic for a handler:
+
+    while socket is open:
+        for each message in messagebox:
+            remove message from messagebox
+            send message
+
+        wait for incoming message
+        handle incoming message
+
+#### **Interface client**
+
+A fairly simple set of buttons and fields.
+After entering the IP address and connectiong, a web socket is opened with the given address on port 8002.
+
+The most advanced functionality is the chart which displays sensor values.
+It stores a list which is 10000 long, each element representing a value at the given millisecond.
+When receiving a value outside of the time bounds of the list, it clears itself and starts representing the new time bound.
+This is illustrated in the following pseudocode:
+
+    if time < base or time > base + 10000
+        clear measurements
+        base := time floored to lowest multiple of 10000
+
+    add measurment to measurements at time
+
 ### Transmitting the data / connectivity
 
 ### Presenting the data
