@@ -243,6 +243,66 @@ This is illustrated in the following pseudocode:
 
 ### Transmitting the data / connectivity
 
+As previously mentioned, the project uses local WiFi as the wireless protocol.
+This is because the robotics project requires realtime streaming of data over a relatively short distance, which is what WiFi excells at.
+Further work might require video streaming, in which case, using something like LoRa would be unfeasable.
+
+Another requirement is multiway-way communication.
+That is, the robot controller can send messages to the interface, and vice-versa.
+This differs from HTTP-based protocols like Webhook, since their communication is server-client-based.
+Because of this, the WebSocket protocol was chosen.
+
+Each packet is formatted as a bitstring, with each bit representing a type.
+This means that each contains 255 potential types.
+While that does seem redundant, it allows for the flexibility of always adding types throughout development without worrying about running out of bits.
+
+The pattern can be seen as follows:
+
+    0   1   2   4   5
+    request
+        data
+            image
+            measurement
+                rotation
+                    quaternions
+                    radians
+                    degrees
+                acceleration
+                    raw
+                    relative
+                    world
+                gravity
+    status
+    data
+        image
+        measurmenet
+            rotation
+                quaternions
+                radians
+                degrees
+            acceleration
+                raw
+                relative
+                world
+            gravity
+    command
+        move
+            first
+                none
+                forward
+                backward
+            second
+                none
+                forward
+                backward
+            firstAndSecond
+                none
+                forward
+                backward
+        rotate
+            right
+            left
+
 ### Presenting the data
 
 ### Finalizing the design
