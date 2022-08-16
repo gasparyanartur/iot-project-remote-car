@@ -174,6 +174,10 @@ Because of this, a counter weight has been placed inside of the robot, but this 
 
 ### Platform
 
+The project is entirely locally hosted over a WiFi network.
+Because it is a robotics project, most control and interaction occurs realtime.
+Hosting the project locally ensures full control over the various components and makes further development relatively seamless.
+
 ### The code
 
 ### Transmitting the data / connectivity
