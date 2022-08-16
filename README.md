@@ -305,4 +305,13 @@ The pattern can be seen as follows:
 
 ### Presenting the data
 
+The resulting dashboard can be seen in the following image:
+
+![Image of the dashboard on the web page](tutorial/dashboard.png)
+
+As one can see, the robot sends sensor measurements about 10 times per second.
+These measurements then get stored in a 10 second interval, afterwhich they get erased.
+This is because the measurments are simply used for the graph in the current moment.
+If one was to use them for more advanced purposes, such as data analysis and machine learning, they could be stored either locally or in a database.
+
 ### Finalizing the design
