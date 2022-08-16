@@ -245,7 +245,7 @@ This is illustrated in the following pseudocode:
 
 As previously mentioned, the project uses local WiFi as the wireless protocol.
 This is because the robotics project requires realtime streaming of data over a relatively short distance, which is what WiFi excells at.
-Further work might require video streaming, in which case, using something like LoRa would be unfeasable.
+Further work might require video streaming, in which case the high data load would render something like LoRa unfeasable.
 
 Another requirement is multiway-way communication.
 That is, the robot controller can send messages to the interface, and vice-versa.
