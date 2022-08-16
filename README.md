@@ -315,3 +315,26 @@ This is because the measurments are simply used for the graph in the current mom
 If one was to use them for more advanced purposes, such as data analysis and machine learning, they could be stored either locally or in a database.
 
 ### Finalizing the design
+
+Here is a video demonstration where I display the current functionality of the project.
+
+... YOUTUBE ....
+
+As one can see, the messaging has a tendency of being unstable.
+One pattern I've noticed is the control server sometimes bugging out and starting to send junk values to the ESP32.
+I'm not quite sure what causes it, but I know that restarting the whole setup makes it work again.
+
+Another issue is that fact that the robot continues despite losing the connection.
+This is obviously a safety hazard and needs to be fixed.
+One possible fix would be to stop the motor after 500ms.
+The control server would then periodically repeat the signal until the interface gave a different instruction.
+
+Overall, the project turned out quite well.
+It needs refinement in order to actually be usable, but as a prototype it serves it's purpose.
+
+Finally, here are some pictures of the robot:
+
+![Picture of the robot](tutorial/demo1.jpg)
+![Picture of the robot](tutorial/demo2.jpg)
+![Picture of the robot](tutorial/demo3.jpg)
+![Picture of the robot](tutorial/demo4.jpg)
