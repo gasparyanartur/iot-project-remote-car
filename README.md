@@ -325,8 +325,21 @@ This is obviously a safety hazard and needs to be fixed.
 One possible fix would be to stop the motor after 500ms.
 The control server would then periodically repeat the signal until the interface gave a different instruction.
 
-Overall, the project turned out quite well.
-It needs refinement in order to actually be usable, but as a prototype it serves it's purpose.
+On the hardware side, one can notice the robot slightly turning when given the command to move forward.
+This is because the structural integrity of the robot is quite poor, resulting in unbalanced and poor control.
+For future work, one could get better a better chassis and more precise motors.
+A potential option to explore could be the 3D-printing of various components in order to secure a tighter build.
+If combined with a soldered board, the design could become more robust and stable.
+This would also open the possibility to make the robot more aesthetic as well as adding more components, such as a camera, monitor, and power switch.
+
+One thing to point out is that absolutely no focus has been placed on security.
+In fact, the TCP connection between the various components does not even use SSL, which means that anyone could see the contents of the packages.
+Currently, anyone on the local network could connect to the robot and start controlling it.
+Even worse, if one had access to the global IP-address, then one could potentially take over the robot even from outside the network.
+Therefore, if one was to use the robot in production, several safety measures would need to added such as encryption and passwords.
+
+Despite the shortcoming, the project turned out quite well for the intended scope.
+It needs much refinement in order to actually be usable, but as a prototype it serves it's purpose.
 
 Finally, here are some pictures of the robot:
 
